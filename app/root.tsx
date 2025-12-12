@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { HeroUIProvider } from "@heroui/react";
+import { ToastProvider } from "~/components/Toast/ToastProvider";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -34,7 +35,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body suppressHydrationWarning>
-        <HeroUIProvider>{children}</HeroUIProvider>
+        <HeroUIProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </HeroUIProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import type { Route } from "./+types/home";
 import { homeContent } from "~/constants";
 import DragDropZone from "~/components/DragDropZone";
-import ImagePreview from "~/components/ImagePreview";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import { removeBackground } from "~/services/apiClient";
 import { fileToBase64, downloadImage } from "~/services/fileDownload";
+import { useToast } from "~/hooks/useToast";
 import type { ProcessingState } from "~/types";
+
+// Lazy load heavy components
+const ImagePreview = lazy(() => import("~/components/ImagePreview"));
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -25,6 +28,7 @@ export default function Home() {
   const [processingState, setProcessingState] =
     useState<ProcessingState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   const handleImageSelect = async (file: File) => {
     try {
@@ -39,10 +43,13 @@ export default function Home() {
       const result = await removeBackground(file);
       setProcessedImage(result.imageBase64);
       setProcessingState("done");
+      addToast("success", "Background removed successfully! 🎉");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to process image");
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to process image";
+      setError(errorMessage);
       setProcessingState("error");
-      console.error("Error processing image:", err);
+      addToast("error", errorMessage);
     }
   };
 
@@ -51,7 +58,15 @@ export default function Home() {
     quality?: number
   ) => {
     if (processedImage) {
-      await downloadImage(processedImage, format, quality);
+      try {
+        await downloadImage(processedImage, format, quality ?? 90);
+        addToast(
+          "success",
+          `Image downloaded as ${format.toUpperCase()} successfully!`
+        );
+      } catch (err) {
+        addToast("error", "Failed to download image. Please try again.");
+      }
     }
   };
 
@@ -105,22 +120,26 @@ export default function Home() {
               {processingState === "processing" && currentImage && (
                 <div className="space-y-6">
                   <LoadingSpinner message="Processing your image..." />
-                  <ImagePreview
-                    originalImage={currentImage}
-                    processedImage={null}
-                    onDownload={handleDownload}
-                    onReset={handleReset}
-                  />
+                  <Suspense fallback={<LoadingSpinner message="Loading preview..." />}>
+                    <ImagePreview
+                      originalImage={currentImage}
+                      processedImage={null}
+                      onDownload={handleDownload}
+                      onReset={handleReset}
+                    />
+                  </Suspense>
                 </div>
               )}
 
               {processingState === "done" && currentImage && processedImage && (
-                <ImagePreview
-                  originalImage={currentImage}
-                  processedImage={processedImage}
-                  onDownload={handleDownload}
-                  onReset={handleReset}
-                />
+                <Suspense fallback={<LoadingSpinner message="Loading preview..." />}>
+                  <ImagePreview
+                    originalImage={currentImage}
+                    processedImage={processedImage}
+                    onDownload={handleDownload}
+                    onReset={handleReset}
+                  />
+                </Suspense>
               )}
             </div>
           </div>
