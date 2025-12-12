@@ -80,398 +80,295 @@ bg-remover/
 
 ---
 
-### 1.2 - `feature/routing-setup`
+### 1.2 - `feature/routing-setup` ✅ COMPLÉTÉE
 
 **Objectif** : Configurer React Router v7 comme framework
 
-- [ ] Créer `router.ts` avec `createBrowserRouter`
-- [ ] Définir les routes principales :
-  - `GET /` → `index.tsx` (landing)
-  - `GET /editor` → `editor.tsx` (app)
-  - `*` → `notfound.tsx` (404)
-- [ ] Créer `__root.tsx` (layout racine avec `Outlet`)
-- [ ] Configurer error boundary (`error.tsx`)
-- [ ] Configurer `main.tsx` pour boostrap avec `RouterProvider`
-- [ ] Créer composant Header/Navigation (shareable via `__root.tsx`)
-- [ ] Créer composant Footer (shareable via `__root.tsx`)
-- [ ] Ajouter transitions/animations entre routes
+- [x] Créer `routes.ts` avec configuration des routes
+- [x] Définir les routes principales :
+  - `GET /` → `home.tsx` (page unique - landing + editor)
+  - ~~`GET /editor`~~ (fusionné avec home)
+  - ~~`*` → `notfound.tsx`~~ (non nécessaire pour MVP)
+- [x] Créer `layout.tsx` (layout racine avec `Outlet`)
+- [x] Créer `root.tsx` (racine de l'app)
+- [x] Créer composant Footer (shareable via `layout.tsx`)
+- [x] Ajouter transitions/animations Tailwind
 
-**Fichiers à créer/modifier:**
+**Fichiers créés/modifiés:**
 
-- `src/router.ts`
-- `src/main.tsx`
-- `src/routes/__root.tsx`
-- `src/routes/index.tsx` (placeholder)
-- `src/routes/editor.tsx` (placeholder)
-- `src/routes/error.tsx`
-- `src/routes/notfound.tsx`
-- `src/components/Header.tsx`
-- `src/components/Footer.tsx`
+- `app/routes.ts`
+- `app/root.tsx`
+- `app/routes/layout.tsx`
+- `app/routes/home.tsx`
+- `app/components/Footer.tsx`
 
 ---
 
-### 1.3 - `feature/api-routes-setup`
+### 1.3 - `feature/api-routes-setup` ✅ COMPLÉTÉE
 
 **Objectif** : Créer structure des routes API avec RRv7
 
-- [ ] Créer dossier `src/routes/api/`
-- [ ] Route `GET /api/health` → test de santé du serveur
-- [ ] Route `POST /api/remove-background` → stub/mock (retourne JSON de test)
-- [ ] Route `GET /api/status` (optionnel) → infos serveur
-- [ ] Configurer actions pour accepter FormData (multipart)
-- [ ] Response JSON standardisée pour toutes les routes
-- [ ] Error handling avec codes HTTP appropriés
-- [ ] Configurer CORS headers si nécessaire
-- [ ] Logger les requêtes en dev
+- [x] Créer dossier `app/routes/api/`
+- [x] Route `GET /api/health` → test de santé du serveur
+- [x] Route `POST /api/remove-background` → avec remove.bg API
+- [x] Route `GET /api/status` → infos serveur
+- [x] Configurer actions pour accepter FormData (multipart)
+- [x] Response JSON standardisée pour toutes les routes
+- [x] Error handling avec codes HTTP appropriés
+- [x] Validation des requêtes
 
-**Spécificités RRv7:**
+**Fichiers créés:**
 
-- [ ] Utiliser `action` handler sur les routes
-- [ ] Accepter `Request` et retourner `Response`
-- [ ] Gérer multipart/form-data avec API standard
-- [ ] Validation des requêtes
-
-**Fichiers à créer/modifier:**
-
-- `src/routes/api/health.ts` (GET /api/health)
-- `src/routes/api/remove-background.ts` (POST /api/remove-background - stub)
-- `src/routes/api/status.ts` (GET /api/status optionnel)
-- `src/router.ts` (enregistrer routes API)
-- `src/routes/api/utils.ts` (helpers : response formatter, error handler)
+- `app/routes/api/health.ts`
+- `app/routes/api/remove-background.ts`
+- `app/routes/api/status.ts`
+- `app/server/utils/utils.ts`
+- `app/server/utils/env.ts`
+- `app/types/index.ts`
 
 ---
 
-## Phase 2: Frontend - Landing Page
+## Phase 2: Frontend - Landing Page ✅ COMPLÉTÉE
 
-### 2.1 - `feature/landing-page-hero`
+### 2.1 - `feature/landing-page-hero` ✅
 
 **Objectif** : Créer la section hero attractive
 
-- [ ] Implémenter Hero section dans `routes/index.tsx`
-- [ ] Titre, sous-titre, description du service
-- [ ] Image/illustration de démonstration (ou mockup)
-- [ ] Bouton CTA "Commencer" qui navigue vers `/editor` (utiliser `Link` de RRv7)
-- [ ] Styling Tailwind responsive (mobile-first)
-- [ ] Animation subtle Tailwind (fade, slide)
-- [ ] Intégrer avec layout racine (`Outlet`)
+- [x] Implémenter Hero section dans `routes/home.tsx`
+- [x] Titre, sous-titre, description du service
+- [x] ~~Bouton CTA~~ (intégration directe avec dropzone)
+- [x] Styling Tailwind responsive (mobile-first)
+- [x] Animations Tailwind (fade-in-up, blob)
+- [x] Dropzone intégrée dans la section hero (min-h-screen)
 
-**Fichiers à créer/modifier:**
+**Fichiers créés:**
 
-- `src/routes/index.tsx`
-- Optionnel: `src/index.css` pour animations custom
+- `app/routes/home.tsx` (hero section complète)
+- `app/constants.ts` (contenu centralisé)
 
 ---
 
-### 2.2 - `feature/landing-page-features`
+### 2.2 - `feature/landing-page-features` ✅
 
 **Objectif** : Ajouter section des features/avantages
 
-- [ ] Créer composant `FeatureCard.tsx`
-- [ ] Section avec 3-4 features principales dans `routes/index.tsx`
-- [ ] Icônes + descriptions pour chaque feature
-- [ ] Layout en grille responsive
-- [ ] Design cohérent avec Hero
+- [x] Créer composant `FeatureCard.tsx`
+- [x] Section avec features principales
+- [x] Icônes Iconify pour chaque feature
+- [x] Layout en grille responsive
+- [x] Design cohérent avec Hero
 
-**Fichiers à créer/modifier:**
+**Fichiers créés:**
 
-- `src/routes/index.tsx` (compléter)
-- `src/components/FeatureCard.tsx`
+- `app/components/FeatureCard.tsx`
+- Features intégrées dans `app/routes/home.tsx`
 
 ---
 
-### 2.3 - `feature/landing-page-footer`
+### 2.3 - `feature/landing-page-footer` ✅
 
 **Objectif** : Footer réutilisable dans toutes les pages
 
-- [ ] Implémenter Footer dans `components/Footer.tsx`
-- [ ] Liens (privacy, terms, contact, etc.)
-- [ ] Liens réseaux sociaux (optionnel)
-- [ ] Copyright avec année dynamique
-- [ ] Responsive et cohérent
-- [ ] Importé dans `__root.tsx` pour être visible partout
+- [x] Implémenter Footer dans `components/Footer.tsx`
+- [x] Liens réseaux sociaux (GitHub, LinkedIn avec icônes Lucide)
+- [x] Copyright avec année dynamique
+- [x] Layout en colonne (centré verticalement)
+- [x] Responsive et cohérent
+- [x] Importé dans `layout.tsx`
 
-**Fichiers à créer/modifier:**
+**Fichiers créés:**
 
-- `src/components/Footer.tsx`
-- `src/routes/__root.tsx` (intégrer Footer)
+- `app/components/Footer.tsx`
+- Intégré dans `app/routes/layout.tsx`
 
 ---
 
-## Phase 3: Frontend - Editor Page
+## Phase 3: Frontend - Editor Page ✅ COMPLÉTÉE (fusionné avec home)
 
-### 3.1 - `feature/drag-drop-zone`
+### 3.1 - `feature/drag-drop-zone` ✅
 
 **Objectif** : Créer zone de drag & drop pour images
 
-- [ ] Composant `DragDropZone.tsx` avec TypeScript strict
-- [ ] Support drag & drop natif
-- [ ] Support clic pour sélectionner fichier (input hidden)
-- [ ] Validation des fichiers (images seulement, taille max)
-- [ ] Messages d'erreur clairs
-- [ ] Styling Tailwind attractive
-- [ ] États visuels (hover, active, error, disabled)
+- [x] Composant `DragDropZone.tsx` avec TypeScript strict
+- [x] Support drag & drop avec react-dropzone
+- [x] Support clic pour sélectionner fichier
+- [x] Validation des fichiers (PNG/JPG/JPEG/WebP, max 10MB)
+- [x] Messages d'erreur clairs
+- [x] Styling Tailwind attractive avec animations
+- [x] États visuels (hover, active, error, disabled)
+- [x] Fix: pointer-events pour click behavior
+- [x] Fix: resizing avec max-w-4xl
 
-**Fichiers à créer/modifier:**
+**Fichiers créés:**
 
-- `src/components/DragDropZone.tsx`
-- `src/types/index.ts` (types Image, ImageData, etc.)
-- `src/routes/editor.tsx` (intégrer le composant)
+- `app/components/DragDropZone.tsx`
+- Intégré dans `app/routes/home.tsx` (hero section)
 
 ---
 
-### 3.2 - `feature/image-preview`
+### 3.2 - `feature/image-preview` ✅
 
 **Objectif** : Afficher aperçu de l'image uploadée
 
-- [ ] Composant `ImagePreview.tsx`
-- [ ] Layout : image original + image traitée (side-by-side responsive)
-- [ ] Boutons actions (télécharger, réinitialiser, nouvel upload, etc.)
-- [ ] Loading states
-- [ ] Error states avec retry
-- [ ] Success states
-- [ ] Responsive design (stacked sur mobile)
+- [x] Composant `ImagePreview.tsx`
+- [x] Layout : image original + image traitée (side-by-side responsive)
+- [x] Boutons actions (télécharger, nouvel upload)
+- [x] Loading states avec LoadingSpinner
+- [x] Error states avec retry
+- [x] Success states
+- [x] Responsive design (stacked sur mobile)
+- [x] Background quadrillé pour transparence
 
-**Fichiers à créer/modifier:**
+**Fichiers créés:**
 
-- `src/components/ImagePreview.tsx`
-- `src/routes/editor.tsx` (layout général)
-- `src/types/index.ts` (ajouter types ProcessingState)
+- `app/components/ImagePreview.tsx`
+- `app/components/LoadingSpinner.tsx`
 
 ---
 
-### 3.3 - `feature/editor-layout`
+### 3.3 - `feature/editor-layout` ✅
 
 **Objectif** : Créer layout complet de la page éditeur
 
-- [ ] Intégrer `DragDropZone` + `ImagePreview` dans `routes/editor.tsx`
-- [ ] Layout responsif (mobile : vertical, desktop : grid/flex)
-- [ ] États de l'app :
-  - Initial (drop zone vide)
-  - Processing (spinner, disabled UI)
-  - Done (image traitée affichée)
-  - Error (message + retry)
-- [ ] Utiliser Context ou State lifting pour gérer états
-- [ ] Styling cohérent avec landing
-- [ ] Intégration avec layout racine
+- [x] Intégrer `DragDropZone` + `ImagePreview` dans `routes/home.tsx`
+- [x] Layout responsif (mobile : vertical, desktop : grid)
+- [x] États de l'app :
+  - [x] Initial (drop zone vide)
+  - [x] Processing (spinner, disabled UI)
+  - [x] Done (image traitée affichée)
+  - [x] Error (message + retry)
+- [x] State management avec useState
+- [x] Styling cohérent avec landing
+- [x] Intégration avec layout racine
 
-**Fichiers à créer/modifier:**
+**Fichiers modifiés:**
 
-- `src/routes/editor.tsx` (complet)
-- Optionnel: `src/components/ProcessingSpinner.tsx`
-
----
-
-## Phase 4: State Management & Storage
-
-### 4.1 - `feature/localstorage-hook`
-
-**Objectif** : Créer hook personnalisé pour gérer le localStorage
-
-- [ ] Hook `useImageStorage` avec TypeScript
-- [ ] Fonctions :
-  - `saveImage(image: ImageData)` → id
-  - `getImage(id: string)` → ImageData
-  - `deleteImage(id: string)` → boolean
-  - `getAllImages()` → ImageData[]
-  - `getLatestImage()` → ImageData | null
-- [ ] Gestion limites localStorage (~5MB)
-- [ ] Compression/optimisation images base64
-- [ ] Gestion erreurs (quota exceeded, corruption, etc.)
-- [ ] Tests locaux du hook
-
-**Fichiers à créer/modifier:**
-
-- `src/hooks/useImageStorage.ts`
-- `src/types/index.ts` (types ImageData, Storage)
+- `app/routes/home.tsx` (page unique avec tout intégré)
 
 ---
 
-### 4.2 - `feature/image-state-management`
+### 4 - `feature/image-state-management` ✅ COMPLÉTÉE
 
 **Objectif** : Gérer state des images dans l'app
 
-- [ ] State dans `routes/editor.tsx` :
-  - `currentImage` (image upload)
-  - `processedImage` (image sans fond)
-  - `isProcessing` (boolean)
-  - `error` (string | null)
-- [ ] Optionnel: Context `ImageContext` si besoin de partager entre routes
-- [ ] Sauvegarder automatiquement dans localStorage après traitement
-- [ ] Charger dernière image au chargement de la page (ou optionnel)
-- [ ] Clear images avec action utilisateur
+- [x] State dans `routes/home.tsx` :
+  - [x] `currentImage` (image upload)
+  - [x] `processedImage` (image sans fond)
+  - [x] `processingState` (idle | processing | success | error)
+  - [x] `error` (string | null)
+- [x] State management simple avec useState
+- ~~localStorage~~ → Pas implémenté (décision MVP)
 
-**Fichiers à créer/modifier:**
+**Fichiers modifiés:**
 
-- `src/routes/editor.tsx` (ajouter states)
-- Optionnel: `src/context/ImageContext.tsx`
+- `app/routes/home.tsx` (state management)
 
 ---
 
-## Phase 5: API Routes Implementation
+## Phase 5: API Routes Implementation ✅ COMPLÉTÉE
 
-### 5.1 - `feature/api-remove-background-integration`
+### 5.1 - `feature/api-remove-background-integration` ✅
 
 **Objectif** : Intégrer service de suppression du fond dans route API
 
-**Choisir Option A ou B :**
+**Option A - API remove.bg (CHOISIE) ✅**
 
-**Option A - API remove.bg (cloud, facile)**
+- [x] Route handler `POST /api/remove-background`
+  - [x] Récupère image du FormData
+  - [x] Envoie à remove.bg API
+  - [x] Retourne image en base64 PNG
+- [x] Gestion erreurs complète
+- [x] Response JSON standardisée
+- [x] Types TypeScript
 
-- [ ] Installer axios ou fetch pour appels HTTP
-- [ ] Route handler `POST /api/remove-background` :
-  - Récupère image du FormData
-  - Envoie à remove.bg API
-  - Retourne image en base64 PNG
-- [ ] Gestion erreurs :
-  - 400 si pas d'image
-  - 413 si trop gros
-  - 429 si quota dépassé (remove.bg)
-  - 500 si erreur serveur
-- [ ] Response JSON : `{ success: boolean, imageBase64?: string, error?: string }`
-- [ ] Types TypeScript pour responses
+**Fichiers créés:**
 
-**Option B - rembg local (Python subprocess, gratuit)**
-
-- [ ] Installer rembg (`pip install rembg`)
-- [ ] Créer endpoint qui :
-  - Reçoit image
-  - Lance rembg en subprocess
-  - Retourne PNG sans fond
-- [ ] Plus complexe mais gratuit et illimité
-- [ ] Potentiellement plus lent
-
-**Fichiers à créer/modifier:**
-
-- `src/routes/api/remove-background.ts` (compléter logique réelle)
-- `src/types/index.ts` (types API responses)
-- `.env.example` (ajouter REMOVE_BG_API_KEY si option A)
-- `.env` (ne pas committer)
+- `app/routes/api/remove-background.ts`
+- `.env` (BG_REMOVER_API_KEY)
 
 ---
 
-### 5.2 - `feature/api-file-handling`
+### 5.2 - `feature/api-file-handling` ✅
 
-**Objectif** : Gestion robuste des uploads dans les routes API
+**Objectif** : Gestion robuste des uploads
 
-- [ ] Validation stricte des fichiers :
-  - Type MIME image seulement (image/png, jpeg, webp)
-  - Taille max 10MB
-  - Dimensions min/max (optionnel)
-- [ ] Erreurs appropriées :
-  - 400 si format invalide + message clair
-  - 413 si fichier trop gros + limite affichée
-  - 422 si image invalide/corrompue
-- [ ] Logs détaillés pour debug
-- [ ] Tests locaux avec Postman/curl
+- [x] Validation stricte (PNG/JPG/JPEG/WebP, max 10MB)
+- [x] Erreurs appropriées
+- [x] Conversion base64 PNG
 
-**Fichiers à créer/modifier:**
+**Fichiers modifiés:**
 
-- `src/routes/api/utils.ts` (helpers validation)
-- `src/routes/api/remove-background.ts` (intégrer validation)
-- Tests manuels
+- `app/routes/api/remove-background.ts`
+- `app/server/utils/utils.ts`
 
 ---
 
-### 5.3 - `feature/api-error-handling`
+### 5.3 - `feature/api-error-handling` ✅
 
 **Objectif** : Standardiser gestion des erreurs API
 
-- [ ] Créer classe `ApiError` customisée
-- [ ] Middleware error handler global
-- [ ] Tous les endpoints retournent format standard :
-  ```json
-  {
-    "success": true/false,
-    "data": {...},
-    "error": { "code": "ERROR_CODE", "message": "..." }
-  }
-  ```
-- [ ] Logging centralisé
-- [ ] Proper HTTP status codes
-
-**Fichiers à créer/modifier:**
-
-- `src/routes/api/utils.ts` (ajouter error handler, response formatter)
-- `src/routes/api/*.ts` (utiliser error handler)
+- [x] Format standard de response
+- [x] Proper HTTP status codes
+- [x] Messages d'erreur clairs
 
 ---
 
-## Phase 6: Frontend-API Routes Connection
+## Phase 6: Frontend-API Routes Connection ✅ COMPLÉTÉE
 
-### 6.1 - `feature/api-service`
+### 6.1 - `feature/api-service` ✅
 
 **Objectif** : Créer service pour appels aux routes API internes
 
-- [ ] Créer `src/services/apiClient.ts`
-- [ ] Fonction `removeBackground(imageFile: File): Promise<string>` qui :
-  - Crée FormData avec l'image
-  - POST vers `/api/remove-background` (route relative, même domaine)
-  - Retourne image en base64 PNG
-  - Gère les erreurs :
-    - Network errors → "Erreur réseau"
-    - Timeout (30s) → "Le traitement a pris trop longtemps"
-    - API errors → parse message d'erreur retourné
-    - Validation errors → afficher détails
-- [ ] Helpers pour :
-  - `checkHealth()` → GET /api/health
-  - `getStatus()` → GET /api/status (optionnel)
-- [ ] Retry logic optionnel
-- [ ] Logs pour debug
+- [x] Créer `app/services/apiClient.ts`
+- [x] Fonction `removeBackground(imageFile: File): Promise<string>`
+  - [x] Crée FormData avec l'image
+  - [x] POST vers `/api/remove-background`
+  - [x] Retourne image en base64 PNG
+  - [x] Gère les erreurs (network, timeout, API, validation)
 
-**Fichiers à créer/modifier:**
+**Fichiers créés:**
 
-- `src/services/apiClient.ts`
-- `src/types/index.ts` (types API responses)
+- `app/services/apiClient.ts`
 
 ---
 
-### 6.2 - `feature/connect-editor-to-api`
+### 6.2 - `feature/connect-editor-to-api` ✅
 
 **Objectif** : Connecter page éditeur aux routes API internes
 
-- [ ] Dans `routes/editor.tsx`, au drag & drop ou clic :
-  - Set `isProcessing = true`
-  - Appeler `removeBackground(file)` via apiClient
-  - Set `processedImage` avec résultat
-  - Set `isProcessing = false`
-- [ ] Gestion erreurs :
-  - Afficher Toast erreur
-  - Garder `currentImage` pour retry
-  - Bouton "Réessayer"
-- [ ] Gestion succès :
-  - Afficher `processedImage` dans `ImagePreview`
-  - Toast succès
-  - Sauvegarder dans localStorage
-- [ ] Prévenir double-click (disable button pendant processing)
-- [ ] Timeout visuel si > 10s
+- [x] Dans `routes/home.tsx` :
+  - [x] Set `processingState = "processing"`
+  - [x] Appeler `removeBackground(file)` via apiClient
+  - [x] Set `processedImage` avec résultat
+  - [x] Set `processingState = "success"`
+- [x] Gestion erreurs avec messages clairs
+- [x] Gestion succès avec affichage ImagePreview
+- [x] Prévention double-click (disable dropzone pendant processing)
 
-**Fichiers à créer/modifier:**
+**Fichiers modifiés:**
 
-- `src/routes/editor.tsx` (ajouter logique appel API)
-- `src/components/ImagePreview.tsx` (afficher résultat)
-- `src/components/Toast.tsx` (si pas encore)
+- `app/routes/home.tsx` (logique complète)
 
 ---
 
-## Phase 7: Download & Export
+## Phase 7: Download & Export ✅ PARTIELLEMENT COMPLÉTÉE
 
-### 7.1 - `feature/image-download`
+### 7.1 - `feature/image-download` ✅
 
 **Objectif** : Implémenter téléchargement d'image
 
-- [ ] Créer `src/services/fileDownload.ts`
-- [ ] Fonction `downloadImage(base64: string, filename: string, format: 'png' | 'jpg')` qui :
-  - Convertit base64 en Blob
-  - Crée lien de téléchargement
-  - Trigger download avec filename approprié (ex: `bg-removed-2024-12-05.png`)
-- [ ] Bouton "Télécharger PNG" sur `ImagePreview`
-- [ ] Feedback utilisateur (Toast succès)
-- [ ] Gestion erreurs (blob creation error, etc.)
+- [x] Créer `app/services/fileDownload.ts`
+- [x] Fonction `downloadImage(base64: string, filename: string)` :
+  - [x] Convertit base64 en Blob
+  - [x] Crée lien de téléchargement
+  - [x] Trigger download avec filename horodaté
+- [x] Bouton "Télécharger PNG" sur `ImagePreview`
+- ~~Toast feedback~~ (non implémenté pour MVP)
 
-**Fichiers à créer/modifier:**
+**Fichiers créés:**
 
-- `src/services/fileDownload.ts`
-- `src/components/ImagePreview.tsx` (ajouter bouton + logic)
+- `app/services/fileDownload.ts`
+- Bouton intégré dans `app/components/ImagePreview.tsx`
 
 ---
 
