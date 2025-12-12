@@ -46,9 +46,12 @@ export default function Home() {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async (
+    format: "png" | "jpg" | "webp" = "png",
+    quality?: number
+  ) => {
     if (processedImage) {
-      downloadImage(processedImage);
+      await downloadImage(processedImage, format, quality);
     }
   };
 
