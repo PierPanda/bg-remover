@@ -1,74 +1,115 @@
 import type { Route } from "./+types/remove-background";
 import type { RemoveBackgroundResponse } from "~/types";
-import {
-  successResponse,
-  handleApiError,
-  logRequest,
-  extractFileFromFormData,
-  validateImageFile,
-  fileToBase64,
-  ApiErrorClass,
-} from "../../services/utils";
+import { BgRemoverAPIKey } from "~/server/utils/env";
+import * as RemoveBg from "../../server/utils/utils";
 
 export async function action({ request }: Route.ActionArgs) {
   const startTime = Date.now();
 
   try {
     if (request.method !== "POST") {
-      throw new ApiErrorClass(
+      throw new RemoveBg.ApiErrorClass(
         "METHOD_NOT_ALLOWED",
         "Only POST method is allowed",
         405
       );
     }
 
-    logRequest(request, { action: "remove-background" });
+    RemoveBg.logRequest(request, { action: "remove-background" });
 
-    const file = await extractFileFromFormData(request, "image");
+    const file = await RemoveBg.extractFileFromFormData(request, "image");
 
-    const validation = validateImageFile(file);
+    const validation = RemoveBg.validateImageFile(file);
     if (!validation.isValid && validation.error) {
-      throw new ApiErrorClass(
+      throw new RemoveBg.ApiErrorClass(
         validation.error.code,
         validation.error.message,
         400
       );
     }
 
-    logRequest(request, {
+    RemoveBg.logRequest(request, {
       fileName: file.name,
       fileSize: file.size,
       fileType: file.type,
     });
 
-    // TODO: In Phase 5, replace this with actual background removal service & Integrate remove.bg API
+    if (!BgRemoverAPIKey) {
+      throw new RemoveBg.ApiErrorClass(
+        "CONFIGURATION_ERROR",
+        "Remove.bg API key not configured",
+        500
+      );
+    }
 
-    const imageBase64 = await fileToBase64(file);
+    const formData = new FormData();
+    formData.append("image_file", file);
+    formData.append("size", "auto");
 
-    const delayMs = Number(process.env.REMOVE_BG_DELAY_MS) || 100;
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    const removeBgResponse = await fetch(
+      "https://api.remove.bg/v1.0/removebg",
+      {
+        method: "POST",
+        headers: {
+          "X-Api-Key": BgRemoverAPIKey,
+        },
+        body: formData,
+      }
+    );
+
+    if (!removeBgResponse.ok) {
+      const errorText = await removeBgResponse.text();
+      console.error("Remove.bg API error:", errorText);
+
+      if (removeBgResponse.status === 402) {
+        throw new RemoveBg.ApiErrorClass(
+          "QUOTA_EXCEEDED",
+          "API quota exceeded. Please try again later.",
+          429
+        );
+      }
+
+      if (removeBgResponse.status === 403) {
+        throw new RemoveBg.ApiErrorClass(
+          "INVALID_API_KEY",
+          "Invalid API key configuration",
+          500
+        );
+      }
+
+      throw new RemoveBg.ApiErrorClass(
+        "PROCESSING_FAILED",
+        "Failed to remove background from image",
+        500
+      );
+    }
+
+    // Convert response to base64
+    const imageBuffer = await removeBgResponse.arrayBuffer();
+    const base64 = Buffer.from(imageBuffer).toString("base64");
+    const imageBase64 = `data:image/png;base64,${base64}`;
 
     const processingTime = Date.now() - startTime;
 
     const response: RemoveBackgroundResponse = {
       imageBase64,
       format: "png",
-      size: file.size,
+      size: imageBuffer.byteLength,
       processingTime,
     };
 
-    logRequest(request, {
+    RemoveBg.logRequest(request, {
       success: true,
       processingTime: `${processingTime}ms`,
     });
 
-    return successResponse(response);
+    return RemoveBg.successResponse(response);
   } catch (error) {
-    logRequest(request, {
+    RemoveBg.logRequest(request, {
       error: error instanceof Error ? error.message : "Unknown error",
     });
 
-    return handleApiError(error);
+    return RemoveBg.handleApiError(error);
   }
 }
 
