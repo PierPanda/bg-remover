@@ -1,12 +1,12 @@
 import { useState } from "react";
 import type { Route } from "./+types/home";
+import { homeContent } from "~/constants";
 import DragDropZone from "~/components/DragDropZone";
 import ImagePreview from "~/components/ImagePreview";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import { removeBackground } from "~/services/apiClient";
 import { fileToBase64, downloadImage } from "~/services/fileDownload";
 import type { ProcessingState } from "~/types";
-import Footer from "~/components/Footer";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -64,21 +64,20 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      <section className="min-h-screen overflow-hidden bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 pt-32 pb-20">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-6xl">
-            <div className="text-center">
-              <h1 className="mb-6 animate-fade-in-up bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-5xl font-bold text-transparent md:text-7xl">
-                Remove Backgrounds Instantly
+      <section className="min-h-screen overflow-hidden pt-32 pb-20">
+        <div className="mx-auto px-4">
+          <div className="mx-auto">
+            <div className="text-center mb-12">
+              <h1 className="mb-6 animate-fade-in-up bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-5xl font-bold text-transparent md:text-7xl leading-tight">
+                {homeContent.title}
               </h1>
 
-              <p className="animate-fade-in-up text-lg text-gray-700 dark:text-gray-300 md:text-xl [animation-delay:100ms]">
-                Transform your images in seconds with our powerful AI-powered
-                background remover. No signup required, completely free to use.
+              <p className="animate-fade-in-up text-lg text-gray-700/50 dark:text-gray-300 md:text-xl [animation-delay:100ms] max-w-3xl mx-auto">
+                {homeContent.description}
               </p>
             </div>
 
-            <div className="space-y-8">
+            <div className="mx-auto mt-12 w-full max-w-4xl px-4">
               {error && (
                 <div className="rounded-lg bg-red-50 p-4 text-center dark:bg-red-950/20">
                   <p className="font-semibold text-red-600 dark:text-red-400">
@@ -125,12 +124,6 @@ export default function Home() {
               )}
             </div>
           </div>
-        </div>
-
-        <div className="absolute left-0 top-0 -z-10 h-full w-full overflow-hidden">
-          <div className="absolute -left-4 top-1/4 h-72 w-72 animate-blob rounded-full bg-purple-300 opacity-20 mix-blend-multiply blur-xl filter dark:bg-purple-600"></div>
-          <div className="animation-delay-2000 absolute -right-4 top-1/3 h-72 w-72 animate-blob rounded-full bg-blue-300 opacity-20 mix-blend-multiply blur-xl filter dark:bg-blue-600"></div>
-          <div className="animation-delay-4000 absolute left-1/3 top-1/2 h-72 w-72 animate-blob rounded-full bg-pink-300 opacity-20 mix-blend-multiply blur-xl filter dark:bg-pink-600"></div>
         </div>
       </section>
     </div>

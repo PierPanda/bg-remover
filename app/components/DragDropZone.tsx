@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import { dropzoneContent } from "~/constants";
 
 interface DragDropZoneProps {
   onImageSelect: (file: File) => void;
@@ -71,27 +72,27 @@ export default function DragDropZone({
         <div>
           {isDragActive ? (
             <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-              Drop your image here...
+              {dropzoneContent.dropMessage}
             </p>
           ) : isDragReject ? (
             <p className="text-lg font-semibold text-red-600 dark:text-red-400">
-              Invalid file type or size
+              {dropzoneContent.invalidFileTypeError}
             </p>
           ) : (
             <>
               <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-                Drag & drop your image here
+                {dropzoneContent.howTo[0]}
               </p>
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                or click to browse
+                {dropzoneContent.howTo[1]}
               </p>
             </>
           )}
         </div>
 
         <div className="text-xs text-gray-400 dark:text-gray-500">
-          <p>Supported formats: PNG, JPG, JPEG, WebP</p>
-          <p>Maximum size: 10MB</p>
+          <p>{dropzoneContent.supportedFormats}</p>
+          <p>{dropzoneContent.maxFileSize}</p>
         </div>
 
         {fileRejections.length > 0 && (
