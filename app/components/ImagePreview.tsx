@@ -1,11 +1,15 @@
 import { Button, Card, CardBody } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { previewBtnText } from "~/constants";
+import ExportOptions from "./ExportOptions";
+import { useState } from "react";
+
+type ExportFormat = "png" | "jpg" | "webp";
 
 interface ImagePreviewProps {
   originalImage: string;
   processedImage: string | null;
-  onDownload: () => void;
+  onDownload: (format: ExportFormat, quality?: number) => void;
   onReset: () => void;
 }
 
@@ -15,6 +19,16 @@ export default function ImagePreview({
   onDownload,
   onReset,
 }: ImagePreviewProps) {
+  const [showExportOptions, setShowExportOptions] = useState(false);
+
+  const handleQuickDownload = () => {
+    onDownload("png");
+  };
+
+  const handleExportDownload = (format: ExportFormat, quality?: number) => {
+    onDownload(format, quality);
+  };
+
   return (
     <div className="mt-8 space-y-8">
       <div className="grid gap-6 md:grid-cols-2">
@@ -90,12 +104,23 @@ export default function ImagePreview({
         <Button
           color="primary"
           size="lg"
-          onPress={onDownload}
+          onPress={handleQuickDownload}
           isDisabled={!processedImage}
           startContent={<Icon icon={previewBtnText.download.icon} />}
           className="bg-linear-to-r from-blue-600 to-purple-600 font-semibold"
         >
           {previewBtnText.download.text}
+        </Button>
+
+        <Button
+          color="secondary"
+          variant="bordered"
+          size="lg"
+          onPress={() => setShowExportOptions(!showExportOptions)}
+          isDisabled={!processedImage}
+          startContent={<Icon icon="lucide:settings" />}
+        >
+          {showExportOptions ? "Masquer options" : "Options d'export"}
         </Button>
 
         <Button
@@ -108,6 +133,13 @@ export default function ImagePreview({
           {previewBtnText.removeAnother.text}
         </Button>
       </div>
+
+      {showExportOptions && processedImage && (
+        <ExportOptions
+          imageBase64={processedImage}
+          onDownload={handleExportDownload}
+        />
+      )}
     </div>
   );
 }
