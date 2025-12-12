@@ -13,6 +13,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\""
   },
   "dependencies": {
+    "@emotion/is-prop-valid": "^1.4.0",
+    "@emotion/react": "^11.14.0",
     "@heroui/react": "^2.8.5",
     "@heroui/theme": "^2.4.23",
     "@react-router/node": "7.10.1",
