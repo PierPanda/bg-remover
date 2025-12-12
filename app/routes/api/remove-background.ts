@@ -45,7 +45,8 @@ export async function action({ request }: Route.ActionArgs) {
 
     const imageBase64 = await fileToBase64(file);
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const delayMs = Number(process.env.REMOVE_BG_DELAY_MS) || 100;
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
 
     const processingTime = Date.now() - startTime;
 
