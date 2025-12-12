@@ -15,9 +15,7 @@ export default function ImagePreview({
 }: ImagePreviewProps) {
   return (
     <div className="space-y-6">
-      {/* Images side by side */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Original Image */}
         <Card>
           <CardBody className="p-0">
             <div className="relative">
@@ -34,16 +32,14 @@ export default function ImagePreview({
           </CardBody>
         </Card>
 
-        {/* Processed Image */}
         <Card>
           <CardBody className="p-0">
             <div className="relative">
-              <div className="absolute left-4 top-4 z-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-3 py-1 text-sm font-semibold text-white backdrop-blur-sm">
+              <div className="absolute left-4 top-4 z-10 rounded-lg bg-linear-to-r from-blue-600 to-purple-600 px-3 py-1 text-sm font-semibold text-white backdrop-blur-sm">
                 {processedImage ? "Processed" : "Processing..."}
               </div>
               {processedImage ? (
                 <div className="relative">
-                  {/* Checkered background to show transparency */}
                   <div
                     className="absolute inset-0 rounded-lg"
                     style={{
@@ -88,7 +84,6 @@ export default function ImagePreview({
         </Card>
       </div>
 
-      {/* Action buttons */}
       <div className="flex flex-wrap items-center justify-center gap-4">
         <Button
           color="primary"
@@ -110,7 +105,7 @@ export default function ImagePreview({
               />
             </svg>
           }
-          className="bg-gradient-to-r from-blue-600 to-purple-600 font-semibold"
+          className="bg-linear-to-r from-blue-600 to-purple-600 font-semibold"
         >
           Download PNG
         </Button>
