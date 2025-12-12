@@ -1,0 +1,144 @@
+import { Button, Card, CardBody } from "@heroui/react";
+
+interface ImagePreviewProps {
+  originalImage: string;
+  processedImage: string | null;
+  onDownload: () => void;
+  onReset: () => void;
+}
+
+export default function ImagePreview({
+  originalImage,
+  processedImage,
+  onDownload,
+  onReset,
+}: ImagePreviewProps) {
+  return (
+    <div className="space-y-6">
+      {/* Images side by side */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Original Image */}
+        <Card>
+          <CardBody className="p-0">
+            <div className="relative">
+              <div className="absolute left-4 top-4 z-10 rounded-lg bg-black/60 px-3 py-1 text-sm font-semibold text-white backdrop-blur-sm">
+                Original
+              </div>
+              <img
+                src={originalImage}
+                alt="Original"
+                className="h-auto w-full rounded-lg object-contain"
+                style={{ maxHeight: "400px" }}
+              />
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* Processed Image */}
+        <Card>
+          <CardBody className="p-0">
+            <div className="relative">
+              <div className="absolute left-4 top-4 z-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-3 py-1 text-sm font-semibold text-white backdrop-blur-sm">
+                {processedImage ? "Processed" : "Processing..."}
+              </div>
+              {processedImage ? (
+                <div className="relative">
+                  {/* Checkered background to show transparency */}
+                  <div
+                    className="absolute inset-0 rounded-lg"
+                    style={{
+                      backgroundImage: `
+                        linear-gradient(45deg, #ccc 25%, transparent 25%),
+                        linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #ccc 75%),
+                        linear-gradient(-45deg, transparent 75%, #ccc 75%)
+                      `,
+                      backgroundSize: "20px 20px",
+                      backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px",
+                    }}
+                  />
+                  <img
+                    src={processedImage}
+                    alt="Processed"
+                    className="relative h-auto w-full rounded-lg object-contain"
+                    style={{ maxHeight: "400px" }}
+                  />
+                </div>
+              ) : (
+                <div className="flex h-full min-h-[400px] items-center justify-center bg-gray-100 dark:bg-gray-900">
+                  <div className="text-center text-gray-400">
+                    <svg
+                      className="mx-auto h-16 w-16 animate-pulse"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex flex-wrap items-center justify-center gap-4">
+        <Button
+          color="primary"
+          size="lg"
+          onPress={onDownload}
+          isDisabled={!processedImage}
+          startContent={
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+          }
+          className="bg-gradient-to-r from-blue-600 to-purple-600 font-semibold"
+        >
+          Download PNG
+        </Button>
+
+        <Button
+          color="default"
+          variant="bordered"
+          size="lg"
+          onPress={onReset}
+          startContent={
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          }
+        >
+          Process Another Image
+        </Button>
+      </div>
+    </div>
+  );
+}
