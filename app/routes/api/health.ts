@@ -17,7 +17,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     const healthData: HealthResponse = {
       status: "healthy",
       timestamp: new Date().toISOString(),
-      uptime: Math.floor(uptime / 1000), // in seconds
+      uptime: Math.floor(uptime / 1000),
     };
 
     return successResponse(healthData);
