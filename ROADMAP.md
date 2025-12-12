@@ -14,7 +14,6 @@ bg-remover/
 │   │   ├── index.tsx                  (Landing page - GET /)
 │   │   ├── editor.tsx                 (Editor page - GET /editor)
 │   │   ├── error.tsx                  (Error boundary)
-│   │   ├── notfound.tsx               (404 page)
 │   │   └── api/
 │   │       ├── remove-background.ts   (POST /api/remove-background)
 │   │       ├── health.ts              (GET /api/health)
