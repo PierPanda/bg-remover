@@ -18,7 +18,6 @@ bg-remover/
 │   │   └── api/
 │   │       ├── remove-background.ts   (POST /api/remove-background)
 │   │       ├── health.ts              (GET /api/health)
-│   │       └── status.ts              (GET /api/status optionnel)
 │   ├── components/
 │   │   ├── DragDropZone.tsx
 │   │   ├── ImagePreview.tsx
@@ -38,8 +37,6 @@ bg-remover/
 │   │   └── analytics.ts
 │   ├── types/
 │   │   └── index.ts
-│   ├── context/
-│   │   └── ImageContext.tsx           (optionnel)
 │   ├── index.css
 │   └── main.tsx                       (Bootstrap de l'app)
 ├── tailwind.config.js
