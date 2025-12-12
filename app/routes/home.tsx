@@ -1,5 +1,4 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,5 +8,12 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <Welcome />;
+  return (
+    <div className="flex flex-col items-center justify-center p-4 my-auto">
+      <h1>Welcome to React Router</h1>
+      <p>
+        This is a boilerplate project for you to get started with React Router.
+      </p>
+    </div>
+  );
 }
