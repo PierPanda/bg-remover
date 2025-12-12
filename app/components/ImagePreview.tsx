@@ -1,4 +1,6 @@
 import { Button, Card, CardBody } from "@heroui/react";
+import { Icon } from "@iconify/react";
+import { previewBtnText } from "~/constants";
 
 interface ImagePreviewProps {
   originalImage: string;
@@ -14,7 +16,7 @@ export default function ImagePreview({
   onReset,
 }: ImagePreviewProps) {
   return (
-    <div className="space-y-6">
+    <div className="mt-8 space-y-8">
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardBody className="p-0">
@@ -61,7 +63,7 @@ export default function ImagePreview({
                   />
                 </div>
               ) : (
-                <div className="flex h-full min-h-[400px] items-center justify-center bg-gray-100 dark:bg-gray-900">
+                <div className="flex h-full min-h-100 items-center justify-center bg-gray-100 dark:bg-gray-900">
                   <div className="text-center text-gray-400">
                     <svg
                       className="mx-auto h-16 w-16 animate-pulse"
@@ -90,24 +92,10 @@ export default function ImagePreview({
           size="lg"
           onPress={onDownload}
           isDisabled={!processedImage}
-          startContent={
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-              />
-            </svg>
-          }
+          startContent={<Icon icon={previewBtnText.download.icon} />}
           className="bg-linear-to-r from-blue-600 to-purple-600 font-semibold"
         >
-          Download PNG
+          {previewBtnText.download.text}
         </Button>
 
         <Button
@@ -115,23 +103,9 @@ export default function ImagePreview({
           variant="bordered"
           size="lg"
           onPress={onReset}
-          startContent={
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-          }
+          startContent={<Icon icon={previewBtnText.removeAnother.icon} />}
         >
-          Process Another Image
+          {previewBtnText.removeAnother.text}
         </Button>
       </div>
     </div>
