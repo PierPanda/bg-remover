@@ -19,11 +19,31 @@ export default [
         },
       },
       globals: {
+        // React globals
         React: "writable",
+
+        // Browser globals
         console: "readonly",
         document: "readonly",
         window: "readonly",
+        Image: "readonly",
+        File: "readonly",
+        FileReader: "readonly",
+        FormData: "readonly",
+        Response: "readonly",
+        Request: "readonly",
+        Headers: "readonly",
+        fetch: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+
+        // Node.js globals
         process: "readonly",
+        Buffer: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
       },
     },
     plugins: {

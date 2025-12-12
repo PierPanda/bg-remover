@@ -1,8 +1,14 @@
 import { Button, Slider } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
+import {
+  exportFormats,
+  exportOptionsContent,
+  exportQualityConfig,
+  type ExportFormatValue,
+} from "~/constants";
 
-type ExportFormat = "png" | "jpg" | "webp";
+type ExportFormat = ExportFormatValue;
 
 interface ExportOptionsProps {
   imageBase64: string;
@@ -14,13 +20,9 @@ export default function ExportOptions({
   onDownload,
 }: ExportOptionsProps) {
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>("png");
-  const [quality, setQuality] = useState<number>(90);
-
-  const formats: { value: ExportFormat; label: string; icon: string }[] = [
-    { value: "png", label: "PNG (Transparent)", icon: "lucide:image" },
-    { value: "jpg", label: "JPG (Compressed)", icon: "lucide:image" },
-    { value: "webp", label: "WebP (Modern)", icon: "lucide:image" },
-  ];
+  const [quality, setQuality] = useState<number>(
+    exportQualityConfig.defaultQuality
+  );
 
   const handleDownload = () => {
     onDownload(selectedFormat, selectedFormat === "png" ? undefined : quality);
@@ -42,16 +44,15 @@ export default function ExportOptions({
   return (
     <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
       <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-        Options d'export
+        {exportOptionsContent.title}
       </h3>
 
-      {/* Format Selection */}
       <div className="mb-6">
         <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Format de fichier
+          {exportOptionsContent.formatLabel}
         </label>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {formats.map((format) => (
+          {exportFormats.map((format) => (
             <button
               key={format.value}
               onClick={() => setSelectedFormat(format.value)}
@@ -85,42 +86,38 @@ export default function ExportOptions({
         </div>
       </div>
 
-      {/* Quality Slider (only for JPG and WebP) */}
       {(selectedFormat === "jpg" || selectedFormat === "webp") && (
         <div className="mb-6">
           <label className="mb-3 flex items-center justify-between text-sm font-medium text-gray-700 dark:text-gray-300">
-            <span>Qualité</span>
-            <span className="text-blue-600 dark:text-blue-400">
-              {quality}%
-            </span>
+            <span>{exportOptionsContent.qualityLabel}</span>
+            <span className="text-blue-600 dark:text-blue-400">{quality}%</span>
           </label>
           <Slider
             size="sm"
-            step={5}
-            minValue={50}
-            maxValue={100}
+            step={exportQualityConfig.step}
+            minValue={exportQualityConfig.minQuality}
+            maxValue={exportQualityConfig.maxQuality}
             value={quality}
             onChange={(value) => setQuality(value as number)}
             className="max-w-full"
             color="primary"
           />
           <div className="mt-2 flex justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>Petite taille</span>
-            <span>Meilleure qualité</span>
+            <span>{exportOptionsContent.qualityRange.min}</span>
+            <span>{exportOptionsContent.qualityRange.max}</span>
           </div>
         </div>
       )}
 
-      {/* File Info */}
       <div className="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-gray-900">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Icon
-              icon="lucide:info"
+              icon={exportOptionsContent.infoIcon}
               className="h-4 w-4 text-gray-500 dark:text-gray-400"
             />
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              Taille estimée:
+              {exportOptionsContent.estimatedSizeLabel}
             </span>
           </div>
           <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -130,30 +127,31 @@ export default function ExportOptions({
 
         {selectedFormat === "png" && (
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            Format sans perte avec transparence
+            {exportOptionsContent.formatDescriptions.png}
           </p>
         )}
         {selectedFormat === "jpg" && (
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            Format compressé sans transparence (fond blanc)
+            {exportOptionsContent.formatDescriptions.jpg}
           </p>
         )}
         {selectedFormat === "webp" && (
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            Format moderne avec compression optimale
+            {exportOptionsContent.formatDescriptions.webp}
           </p>
         )}
       </div>
 
-      {/* Download Button */}
       <Button
         color="primary"
         className="w-full"
         size="lg"
         onPress={handleDownload}
-        startContent={<Icon icon="lucide:download" className="h-5 w-5" />}
+        startContent={
+          <Icon icon={exportOptionsContent.downloadIcon} className="h-5 w-5" />
+        }
       >
-        Télécharger {selectedFormat.toUpperCase()}
+        {exportOptionsContent.downloadButton} {selectedFormat.toUpperCase()}
       </Button>
     </div>
   );

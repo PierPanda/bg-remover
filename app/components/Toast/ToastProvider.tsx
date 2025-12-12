@@ -1,5 +1,11 @@
-import { createContext, useCallback, useState, type ReactNode } from "react";
+import * as React from "react";
 import { Icon } from "@iconify/react";
+import {
+  toastConfig,
+  toastIcons,
+  toastColors,
+  toastContent,
+} from "~/constants";
 
 export type ToastType = "success" | "error" | "warning" | "info";
 
@@ -15,63 +21,27 @@ interface ToastContextType {
   removeToast: (id: string) => void;
 }
 
-export const ToastContext = createContext<ToastContextType | null>(null);
+export const ToastContext = React.createContext<ToastContextType | null>(null);
 
-const MAX_TOASTS = 3;
-const DEFAULT_DURATION = 5000;
+export function ToastProvider({ children }: { children: React.ReactNode }) {
+  const [toasts, setToasts] = React.useState<Toast[]>([]);
 
-const toastIcons: Record<ToastType, string> = {
-  success: "lucide:check-circle",
-  error: "lucide:x-circle",
-  warning: "lucide:alert-triangle",
-  info: "lucide:info",
-};
-
-const toastColors: Record<
-  ToastType,
-  { bg: string; border: string; text: string; icon: string }
-> = {
-  success: {
-    bg: "bg-green-50 dark:bg-green-950/20",
-    border: "border-green-500",
-    text: "text-green-800 dark:text-green-200",
-    icon: "text-green-600 dark:text-green-400",
-  },
-  error: {
-    bg: "bg-red-50 dark:bg-red-950/20",
-    border: "border-red-500",
-    text: "text-red-800 dark:text-red-200",
-    icon: "text-red-600 dark:text-red-400",
-  },
-  warning: {
-    bg: "bg-yellow-50 dark:bg-yellow-950/20",
-    border: "border-yellow-500",
-    text: "text-yellow-800 dark:text-yellow-200",
-    icon: "text-yellow-600 dark:text-yellow-400",
-  },
-  info: {
-    bg: "bg-blue-50 dark:bg-blue-950/20",
-    border: "border-blue-500",
-    text: "text-blue-800 dark:text-blue-200",
-    icon: "text-blue-600 dark:text-blue-400",
-  },
-};
-
-export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<Toast[]>([]);
-
-  const removeToast = useCallback((id: string) => {
+  const removeToast = React.useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
-  const addToast = useCallback(
-    (type: ToastType, message: string, duration = DEFAULT_DURATION) => {
+  const addToast = React.useCallback(
+    (
+      type: ToastType,
+      message: string,
+      duration = toastConfig.defaultDuration
+    ) => {
       const id = `toast-${Date.now()}-${Math.random()}`;
       const newToast: Toast = { id, type, message, duration };
 
       setToasts((prev) => {
         const updated = [...prev, newToast];
-        return updated.slice(-MAX_TOASTS);
+        return updated.slice(-toastConfig.maxToasts);
       });
 
       if (duration > 0) {
@@ -106,9 +76,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 onClick={() => removeToast(toast.id)}
                 className={`shrink-0 ${colors.text} hover:opacity-70 transition-opacity`}
-                aria-label="Close toast"
+                aria-label={toastContent.closeLabel}
               >
-                <Icon icon="lucide:x" className="h-4 w-4" />
+                <Icon icon={toastContent.closeIcon} className="h-4 w-4" />
               </button>
             </div>
           );

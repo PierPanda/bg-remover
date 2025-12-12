@@ -1,10 +1,14 @@
 import { Button, Card, CardBody } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { previewBtnText } from "~/constants";
+import {
+  previewBtnText,
+  imagePreviewContent,
+  type ExportFormatValue,
+} from "~/constants";
 import ExportOptions from "./ExportOptions";
-import { useState } from "react";
+import * as React from "react";
 
-type ExportFormat = "png" | "jpg" | "webp";
+type ExportFormat = ExportFormatValue;
 
 interface ImagePreviewProps {
   originalImage: string;
@@ -19,7 +23,7 @@ export default function ImagePreview({
   onDownload,
   onReset,
 }: ImagePreviewProps) {
-  const [showExportOptions, setShowExportOptions] = useState(false);
+  const [showExportOptions, setShowExportOptions] = React.useState(false);
 
   const handleQuickDownload = () => {
     onDownload("png");
@@ -36,11 +40,11 @@ export default function ImagePreview({
           <CardBody className="p-0">
             <div className="relative">
               <div className="absolute left-4 top-4 z-10 rounded-lg bg-black/60 px-3 py-1 text-sm font-semibold text-white backdrop-blur-sm">
-                Original
+                {imagePreviewContent.labels.original}
               </div>
               <img
                 src={originalImage}
-                alt="Original"
+                alt={imagePreviewContent.labels.original}
                 className="h-auto w-full rounded-lg object-contain"
                 style={{ maxHeight: "400px" }}
               />
@@ -52,7 +56,9 @@ export default function ImagePreview({
           <CardBody className="p-0">
             <div className="relative">
               <div className="absolute left-4 top-4 z-10 rounded-lg bg-linear-to-r from-blue-600 to-purple-600 px-3 py-1 text-sm font-semibold text-white backdrop-blur-sm">
-                {processedImage ? "Processed" : "Processing..."}
+                {processedImage
+                  ? imagePreviewContent.labels.processed
+                  : imagePreviewContent.labels.processing}
               </div>
               {processedImage ? (
                 <div className="relative">
@@ -71,7 +77,7 @@ export default function ImagePreview({
                   />
                   <img
                     src={processedImage}
-                    alt="Processed"
+                    alt={imagePreviewContent.labels.processed}
                     className="relative h-auto w-full rounded-lg object-contain"
                     style={{ maxHeight: "400px" }}
                   />
@@ -118,9 +124,11 @@ export default function ImagePreview({
           size="lg"
           onPress={() => setShowExportOptions(!showExportOptions)}
           isDisabled={!processedImage}
-          startContent={<Icon icon="lucide:settings" />}
+          startContent={<Icon icon={imagePreviewContent.icons.settings} />}
         >
-          {showExportOptions ? "Masquer options" : "Options d'export"}
+          {showExportOptions
+            ? imagePreviewContent.buttons.hideExportOptions
+            : imagePreviewContent.buttons.showExportOptions}
         </Button>
 
         <Button

@@ -1,11 +1,12 @@
 import { Spinner } from "@heroui/react";
+import { loadingSpinnerContent } from "~/constants";
 
 interface LoadingSpinnerProps {
   message?: string;
 }
 
 export default function LoadingSpinner({
-  message = "Processing your image...",
+  message = loadingSpinnerContent.defaultMessage,
 }: LoadingSpinnerProps) {
   return (
     <div className="flex flex-col items-center justify-center gap-6 py-12">
@@ -22,7 +23,7 @@ export default function LoadingSpinner({
           {message}
         </p>
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          This may take a few seconds...
+          {loadingSpinnerContent.subMessage}
         </p>
       </div>
     </div>

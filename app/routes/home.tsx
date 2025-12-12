@@ -1,5 +1,4 @@
-import { useState, lazy, Suspense } from "react";
-import type { Route } from "./+types/home";
+import * as React from "react";
 import { homeContent } from "~/constants";
 import DragDropZone from "~/components/DragDropZone";
 import LoadingSpinner from "~/components/LoadingSpinner";
@@ -8,10 +7,9 @@ import { fileToBase64, downloadImage } from "~/services/fileDownload";
 import { useToast } from "~/hooks/useToast";
 import type { ProcessingState } from "~/types";
 
-// Lazy load heavy components
-const ImagePreview = lazy(() => import("~/components/ImagePreview"));
+const ImagePreview = React.lazy(() => import("~/components/ImagePreview"));
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "BG Remover - Remove Image Backgrounds Instantly" },
     {
@@ -23,11 +21,13 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  const [currentImage, setCurrentImage] = useState<string | null>(null);
-  const [processedImage, setProcessedImage] = useState<string | null>(null);
+  const [currentImage, setCurrentImage] = React.useState<string | null>(null);
+  const [processedImage, setProcessedImage] = React.useState<string | null>(
+    null
+  );
   const [processingState, setProcessingState] =
-    useState<ProcessingState>("idle");
-  const [error, setError] = useState<string | null>(null);
+    React.useState<ProcessingState>("idle");
+  const [error, setError] = React.useState<string | null>(null);
   const { addToast } = useToast();
 
   const handleImageSelect = async (file: File) => {
@@ -64,7 +64,7 @@ export default function Home() {
           "success",
           `Image downloaded as ${format.toUpperCase()} successfully!`
         );
-      } catch (err) {
+      } catch {
         addToast("error", "Failed to download image. Please try again.");
       }
     }
@@ -120,26 +120,30 @@ export default function Home() {
               {processingState === "processing" && currentImage && (
                 <div className="space-y-6">
                   <LoadingSpinner message="Processing your image..." />
-                  <Suspense fallback={<LoadingSpinner message="Loading preview..." />}>
+                  <React.Suspense
+                    fallback={<LoadingSpinner message="Loading preview..." />}
+                  >
                     <ImagePreview
                       originalImage={currentImage}
                       processedImage={null}
                       onDownload={handleDownload}
                       onReset={handleReset}
                     />
-                  </Suspense>
+                  </React.Suspense>
                 </div>
               )}
 
               {processingState === "done" && currentImage && processedImage && (
-                <Suspense fallback={<LoadingSpinner message="Loading preview..." />}>
+                <React.Suspense
+                  fallback={<LoadingSpinner message="Loading preview..." />}
+                >
                   <ImagePreview
                     originalImage={currentImage}
                     processedImage={processedImage}
                     onDownload={handleDownload}
                     onReset={handleReset}
                   />
-                </Suspense>
+                </React.Suspense>
               )}
             </div>
           </div>

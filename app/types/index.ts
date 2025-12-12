@@ -89,3 +89,10 @@ export interface ValidationResult {
     message: string;
   };
 }
+
+export interface ApiErrorObject extends Error {
+  code: ErrorCode | string;
+  statusCode: number;
+  details?: unknown;
+  isApiError: true;
+}
