@@ -14,6 +14,8 @@ env:
 
 jobs:
   deploy:
+    permissions:
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
