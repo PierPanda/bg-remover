@@ -192,7 +192,20 @@ export function logRequest(
 
 export function addCorsHeaders(response: Response): Response {
   const headers = new Headers(response.headers);
-  headers.set("Access-Control-Allow-Origin", "*");
+
+  // Determine allowed origins from environment variable
+  const allowedOrigins = process.env.ALLOWED_ORIGINS;
+  let originToSet = "*";
+  if (allowedOrigins) {
+    // Support comma-separated list of origins
+    originToSet = allowedOrigins;
+  } else if (process.env.NODE_ENV === "production") {
+    // In production, do not allow all origins by default
+    originToSet = ""; // Or optionally, throw an error or log a warning
+  }
+  if (originToSet) {
+    headers.set("Access-Control-Allow-Origin", originToSet);
+  }
   headers.set(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS"
