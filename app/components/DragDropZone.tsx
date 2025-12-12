@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import * as React from "react";
 import { useDropzone } from "react-dropzone";
 import { dropzoneContent } from "~/constants";
 
@@ -11,7 +11,7 @@ export default function DragDropZone({
   onImageSelect,
   disabled = false,
 }: DragDropZoneProps) {
-  const onDrop = useCallback(
+  const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
         onImageSelect(acceptedFiles[0]);
@@ -52,7 +52,6 @@ export default function DragDropZone({
       <input {...getInputProps()} />
 
       <div className="pointer-events-none space-y-4">
-        {/* Upload Icon */}
         <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30">
           <svg
             className="h-12 w-12 text-blue-600 dark:text-blue-400"

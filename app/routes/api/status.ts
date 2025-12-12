@@ -1,10 +1,6 @@
 import type { Route } from "./+types/status";
 import type { StatusResponse } from "~/types";
-import {
-  successResponse,
-  handleApiError,
-  logRequest,
-} from "../../services/utils";
+import { successResponse, handleApiError, logRequest } from "~/services/utils";
 
 export async function loader({ request }: Route.LoaderArgs) {
   try {

@@ -1,10 +1,6 @@
 import type { Route } from "./+types/health";
 import type { HealthResponse } from "~/types";
-import {
-  successResponse,
-  handleApiError,
-  logRequest,
-} from "../../services/utils";
+import { successResponse, handleApiError, logRequest } from "~/services/utils";
 
 const startTime = Date.now();
 

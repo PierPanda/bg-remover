@@ -1,14 +1,16 @@
 import type { Route } from "./+types/remove-background";
 import type { RemoveBackgroundResponse } from "~/types";
 import { BgRemoverAPIKey } from "~/server/utils/env";
-import * as RemoveBg from "../../server/utils/utils";
+import * as RemoveBg from "~/server/utils/utils";
 
 export async function action({ request }: Route.ActionArgs) {
+  const apiUrl = "https://api.remove.bg/v1.0/removebg";
+
   const startTime = Date.now();
 
   try {
     if (request.method !== "POST") {
-      throw new RemoveBg.ApiErrorClass(
+      throw RemoveBg.createApiError(
         "METHOD_NOT_ALLOWED",
         "Only POST method is allowed",
         405
@@ -21,7 +23,7 @@ export async function action({ request }: Route.ActionArgs) {
 
     const validation = RemoveBg.validateImageFile(file);
     if (!validation.isValid && validation.error) {
-      throw new RemoveBg.ApiErrorClass(
+      throw RemoveBg.createApiError(
         validation.error.code,
         validation.error.message,
         400
@@ -35,7 +37,7 @@ export async function action({ request }: Route.ActionArgs) {
     });
 
     if (!BgRemoverAPIKey) {
-      throw new RemoveBg.ApiErrorClass(
+      throw RemoveBg.createApiError(
         "CONFIGURATION_ERROR",
         "Remove.bg API key not configured",
         500
@@ -46,23 +48,20 @@ export async function action({ request }: Route.ActionArgs) {
     formData.append("image_file", file);
     formData.append("size", "auto");
 
-    const removeBgResponse = await fetch(
-      "https://api.remove.bg/v1.0/removebg",
-      {
-        method: "POST",
-        headers: {
-          "X-Api-Key": BgRemoverAPIKey,
-        },
-        body: formData,
-      }
-    );
+    const removeBgResponse = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "X-Api-Key": BgRemoverAPIKey,
+      },
+      body: formData,
+    });
 
     if (!removeBgResponse.ok) {
       const errorText = await removeBgResponse.text();
       console.error("Remove.bg API error:", errorText);
 
       if (removeBgResponse.status === 402) {
-        throw new RemoveBg.ApiErrorClass(
+        throw RemoveBg.createApiError(
           "QUOTA_EXCEEDED",
           "API quota exceeded. Please try again later.",
           429
@@ -70,14 +69,14 @@ export async function action({ request }: Route.ActionArgs) {
       }
 
       if (removeBgResponse.status === 403) {
-        throw new RemoveBg.ApiErrorClass(
+        throw RemoveBg.createApiError(
           "INVALID_API_KEY",
           "Invalid API key configuration",
           500
         );
       }
 
-      throw new RemoveBg.ApiErrorClass(
+      throw RemoveBg.createApiError(
         "PROCESSING_FAILED",
         "Failed to remove background from image",
         500

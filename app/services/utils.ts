@@ -4,6 +4,7 @@ import type {
   FileValidationConfig,
   ValidationResult,
   ErrorCode,
+  ApiErrorObject,
 } from "~/types";
 
 export function successResponse<T>(data: T): Response {
@@ -45,22 +46,34 @@ export function errorResponse(
   });
 }
 
-export class ApiErrorClass extends Error {
-  constructor(
-    public code: ErrorCode | string,
-    message: string,
-    public statusCode: number = 500,
-    public details?: unknown
-  ) {
-    super(message);
-    this.name = "ApiError";
-  }
+export function createApiError(
+  code: ErrorCode | string,
+  message: string,
+  statusCode: number = 500,
+  details?: unknown
+): ApiErrorObject {
+  const error = new Error(message) as ApiErrorObject;
+  error.name = "ApiError";
+  error.code = code;
+  error.statusCode = statusCode;
+  error.details = details;
+  error.isApiError = true;
+  return error;
+}
+
+export function isApiError(error: unknown): error is ApiErrorObject {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "isApiError" in error &&
+    error.isApiError === true
+  );
 }
 
 export function handleApiError(error: unknown): Response {
   console.error("API Error:", error);
 
-  if (error instanceof ApiErrorClass) {
+  if (isApiError(error)) {
     return errorResponse(
       error.code,
       error.message,
@@ -146,7 +159,7 @@ export async function extractFileFromFormData(
   const contentType = request.headers.get("content-type");
 
   if (!contentType?.includes("multipart/form-data")) {
-    throw new ApiErrorClass(
+    throw createApiError(
       "INVALID_REQUEST",
       "Request must be multipart/form-data",
       400
@@ -157,7 +170,7 @@ export async function extractFileFromFormData(
   const file = formData.get(fieldName);
 
   if (!file || !(file instanceof File)) {
-    throw new ApiErrorClass(
+    throw createApiError(
       "MISSING_FILE",
       `No file found in field '${fieldName}'`,
       400

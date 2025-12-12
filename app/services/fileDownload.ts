@@ -1,8 +1,7 @@
-type ExportFormat = "png" | "jpg" | "webp";
+import type { ExportFormatValue } from "~/constants";
 
-/**
- * Convert base64 image to different formats with quality control
- */
+type ExportFormat = ExportFormatValue;
+
 async function convertImageFormat(
   base64Data: string,
   format: ExportFormat,
@@ -22,7 +21,6 @@ async function convertImageFormat(
         return;
       }
 
-      // For JPG, fill with white background (no transparency support)
       if (format === "jpg") {
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -55,16 +53,12 @@ async function convertImageFormat(
   });
 }
 
-/**
- * Download image with format and quality options
- */
 export async function downloadImage(
   base64Data: string,
   format: ExportFormat = "png",
   quality: number = 90
 ): Promise<void> {
   try {
-    // Convert to desired format if not PNG or if quality is specified
     let finalBase64 = base64Data;
     if (format !== "png" || quality < 100) {
       finalBase64 = await convertImageFormat(base64Data, format, quality);
