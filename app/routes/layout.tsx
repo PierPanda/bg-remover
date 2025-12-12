@@ -24,7 +24,7 @@ export default function App() {
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="sm:hidden"
         />
-        <NavbarBrand>
+        <NavbarBrand className="gap-4">
           <img src={Logo} alt="Logo" className="h-12 w-12" />
           <p className="font-bold text-inherit">BG Remover</p>
         </NavbarBrand>
