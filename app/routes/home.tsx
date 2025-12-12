@@ -6,6 +6,7 @@ import LoadingSpinner from "~/components/LoadingSpinner";
 import { removeBackground } from "~/services/apiClient";
 import { fileToBase64, downloadImage } from "~/services/fileDownload";
 import type { ProcessingState } from "~/types";
+import Footer from "~/components/Footer";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -60,10 +61,10 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      <section className="relative min-h-screen overflow-hidden bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
-        <div className="container mx-auto px-4 py-20">
+      <section className="min-h-screen overflow-hidden bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 pt-32 pb-20">
+        <div className="container mx-auto px-4">
           <div className="mx-auto max-w-6xl">
-            <div className="mb-12 text-center">
+            <div className="text-center">
               <h1 className="mb-6 animate-fade-in-up bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-5xl font-bold text-transparent md:text-7xl">
                 Remove Backgrounds Instantly
               </h1>
