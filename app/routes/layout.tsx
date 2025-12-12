@@ -1,4 +1,4 @@
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react";
+import { Navbar, NavbarBrand, NavbarContent } from "@heroui/react";
 import { Outlet, Link } from "react-router";
 
 import Logo from "../assets/logo.png";
