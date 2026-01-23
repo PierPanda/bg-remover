@@ -11,12 +11,12 @@ import {
 type ExportFormat = ExportFormatValue;
 
 interface ExportOptionsProps {
-  imageBase64: string;
+  imageUrl: string;
   onDownload: (format: ExportFormat, quality?: number) => void;
 }
 
 export default function ExportOptions({
-  imageBase64,
+  imageUrl,
   onDownload,
 }: ExportOptionsProps) {
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>("png");
@@ -29,15 +29,16 @@ export default function ExportOptions({
   };
 
   const getFileSize = () => {
-    const base64Length = imageBase64.split(",")[1]?.length || 0;
-    const sizeInBytes = (base64Length * 3) / 4;
+    // Estimation approximative basée sur le format
+    // Pour une meilleure précision, il faudrait charger l'image
+    const estimatedBaseSizeKB = 500;
 
-    let estimatedSize = sizeInBytes;
+    let estimatedSize = estimatedBaseSizeKB;
     if (selectedFormat === "jpg" || selectedFormat === "webp") {
-      estimatedSize = sizeInBytes * (quality / 100) * 0.7;
+      estimatedSize = estimatedBaseSizeKB * (quality / 100) * 0.7;
     }
 
-    return (estimatedSize / 1024).toFixed(0);
+    return estimatedSize.toFixed(0);
   };
 
   return (

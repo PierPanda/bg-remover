@@ -1,6 +1,6 @@
 import type { Route } from "./+types/remove-background";
 import type { RemoveBackgroundApiResponse } from "~/types";
-import { BgRemoverAPIKey } from "~/server/utils/env";
+import { BgRemoverAPIKey, BlobReadWriteToken } from "~/server/utils/env";
 import * as RemoveBg from "~/server/utils/utils";
 import { put } from "@vercel/blob";
 
@@ -8,6 +8,8 @@ export async function action({ request }: Route.ActionArgs) {
   const apiUrl = "https://api.remove.bg/v1.0/removebg";
 
   const startTime = Date.now();
+
+  console.log(BlobReadWriteToken);
 
   try {
     if (request.method !== "POST") {
@@ -130,7 +132,6 @@ export async function action({ request }: Route.ActionArgs) {
         );
       }
 
-      // Pour l'erreur "unknown_foreground", utiliser un code 422 (Unprocessable Entity)
       const statusCode = errorCode === "UNKNOWN_FOREGROUND" ? 422 : 500;
 
       throw RemoveBg.createApiError(errorCode, errorMessage, statusCode);
@@ -140,11 +141,20 @@ export async function action({ request }: Route.ActionArgs) {
 
     console.log("[Upload] Uploading processed image to Vercel Blob...");
 
-    // Upload vers Vercel Blob avec un nom unique
+    if (!BlobReadWriteToken) {
+      console.error("[Upload] BLOB_READ_WRITE_TOKEN not configured");
+      throw RemoveBg.createApiError(
+        "CONFIGURATION_ERROR",
+        "Vercel Blob token not configured",
+        500
+      );
+    }
+
     const filename = `processed-${Date.now()}.png`;
     const blob = await put(filename, imageBuffer, {
       access: "public",
       contentType: "image/png",
+      token: BlobReadWriteToken,
     });
 
     console.log("[Upload] Image uploaded to Vercel Blob:", blob.url);

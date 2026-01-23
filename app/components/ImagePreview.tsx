@@ -144,7 +144,7 @@ export default function ImagePreview({
 
       {showExportOptions && processedImage && (
         <ExportOptions
-          imageBase64={processedImage}
+          imageUrl={processedImage}
           onDownload={handleExportDownload}
         />
       )}

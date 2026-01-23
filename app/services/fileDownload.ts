@@ -3,12 +3,13 @@ import type { ExportFormatValue } from "~/constants";
 type ExportFormat = ExportFormatValue;
 
 async function convertImageFormat(
-  base64Data: string,
+  imageUrl: string,
   format: ExportFormat,
   quality: number = 90
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
+    img.crossOrigin = "anonymous";
 
     img.onload = () => {
       const canvas = document.createElement("canvas");
@@ -49,26 +50,35 @@ async function convertImageFormat(
       reject(new Error("Failed to load image"));
     };
 
-    img.src = base64Data;
+    img.src = imageUrl;
   });
 }
 
 export async function downloadImage(
-  base64Data: string,
+  imageUrl: string,
   format: ExportFormat = "png",
   quality: number = 90
 ): Promise<void> {
   try {
-    let finalBase64 = base64Data;
-    if (format !== "png" || quality < 100) {
-      finalBase64 = await convertImageFormat(base64Data, format, quality);
-    }
-
     const timestamp = Date.now();
     const filename = `bg-removed-${timestamp}.${format}`;
 
+    // Si c'est un blob URL ou si on garde le format PNG par défaut, télécharger directement
+    if (imageUrl.startsWith("blob:") && format === "png") {
+      const link = document.createElement("a");
+      link.href = imageUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+
+    // Sinon, convertir le format
+    const convertedDataUrl = await convertImageFormat(imageUrl, format, quality);
+
     const link = document.createElement("a");
-    link.href = finalBase64;
+    link.href = convertedDataUrl;
     link.download = filename;
 
     document.body.appendChild(link);
@@ -78,24 +88,4 @@ export async function downloadImage(
     console.error("Download failed:", error);
     throw new Error("Failed to download image");
   }
-}
-
-export function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        resolve(reader.result);
-      } else {
-        reject(new Error("Failed to convert file to base64"));
-      }
-    };
-
-    reader.onerror = () => {
-      reject(new Error("Failed to read file"));
-    };
-
-    reader.readAsDataURL(file);
-  });
 }

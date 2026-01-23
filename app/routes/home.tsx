@@ -3,7 +3,7 @@ import { homeContent } from "~/constants";
 import DragDropZone from "~/components/DragDropZone";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import { removeBackground } from "~/services/apiClient";
-import { fileToBase64, downloadImage } from "~/services/fileDownload";
+import { downloadImage } from "~/services/fileDownload";
 import { useToast } from "~/hooks/useToast";
 import type { ProcessingState } from "~/types";
 
@@ -35,13 +35,13 @@ export default function Home() {
       setError(null);
       setProcessingState("uploading");
 
-      const base64 = await fileToBase64(file);
-      setCurrentImage(base64);
+      const objectUrl = URL.createObjectURL(file);
+      setCurrentImage(objectUrl);
 
       setProcessingState("processing");
 
       const result = await removeBackground(file);
-      setProcessedImage(result.imageBase64);
+      setProcessedImage(result.imageUrl);
       setProcessingState("done");
       addToast("success", "Background removed successfully! 🎉");
     } catch (err) {

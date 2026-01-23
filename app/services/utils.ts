@@ -180,17 +180,6 @@ export async function extractFileFromFormData(
   return file;
 }
 
-export async function fileToBase64(file: File): Promise<string> {
-  const buffer = await file.arrayBuffer();
-  const base64 = Buffer.from(buffer).toString("base64");
-  return `data:${file.type};base64,${base64}`;
-}
-
-export function base64ToBuffer(base64: string): Buffer {
-  const base64Data = base64.replace(/^data:image\/\w+;base64,/, "");
-  return Buffer.from(base64Data, "base64");
-}
-
 export function logRequest(
   request: Request,
   additionalInfo?: Record<string, unknown>

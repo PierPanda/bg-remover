@@ -1,4 +1,8 @@
-import type { ApiResponse, RemoveBackgroundResponse, RemoveBackgroundApiResponse } from "~/types";
+import type {
+  ApiResponse,
+  RemoveBackgroundResponse,
+  RemoveBackgroundApiResponse,
+} from "~/types";
 import { errorMessages, type ErrorCode } from "~/constants";
 
 function translateErrorMessage(
@@ -37,7 +41,8 @@ export async function removeBackground(
       }
     }
 
-    const data: ApiResponse<RemoveBackgroundApiResponse> = await response.json();
+    const data: ApiResponse<RemoveBackgroundApiResponse> =
+      await response.json();
 
     if (!data.success || !data.data) {
       const translatedMessage = translateErrorMessage(
@@ -47,15 +52,8 @@ export async function removeBackground(
       throw new Error(translatedMessage);
     }
 
-    // Télécharger l'image depuis Vercel Blob et la convertir en base64 pour l'affichage
-    const imageResponse = await fetch(data.data.imageUrl);
-    const imageBlob = await imageResponse.blob();
-    const arrayBuffer = await imageBlob.arrayBuffer();
-    const base64 = Buffer.from(arrayBuffer).toString("base64");
-    const imageBase64 = `data:image/${data.data.format};base64,${base64}`;
-
     return {
-      imageBase64,
+      imageUrl: data.data.imageUrl,
       format: data.data.format,
       size: data.data.size,
       processingTime: data.data.processingTime,

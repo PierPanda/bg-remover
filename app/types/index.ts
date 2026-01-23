@@ -39,7 +39,7 @@ export interface RemoveBackgroundApiResponse {
 }
 
 export interface RemoveBackgroundResponse {
-  imageBase64: string;
+  imageUrl: string;
   format: "png" | "jpg" | "webp";
   size: number;
   processingTime: number;
@@ -47,8 +47,8 @@ export interface RemoveBackgroundResponse {
 
 export interface ImageData {
   id: string;
-  originalImage: string; // base64
-  processedImage: string; // base64
+  originalImage: string;
+  processedImage: string;
   timestamp: number;
   format: string;
 }
