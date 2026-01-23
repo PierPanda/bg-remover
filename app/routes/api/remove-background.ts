@@ -19,16 +19,25 @@ export async function action({ request }: Route.ActionArgs) {
 
     RemoveBg.logRequest(request, { action: "remove-background" });
 
+    console.log("[Upload] Starting image extraction from form data");
     const file = await RemoveBg.extractFileFromFormData(request, "image");
+    console.log("[Upload] Image extracted successfully:", {
+      name: file.name,
+      size: `${(file.size / 1024).toFixed(2)} KB`,
+      type: file.type,
+    });
 
+    console.log("[Upload] Validating image file");
     const validation = RemoveBg.validateImageFile(file);
     if (!validation.isValid && validation.error) {
+      console.error("[Upload] Validation failed:", validation.error);
       throw RemoveBg.createApiError(
         validation.error.code,
         validation.error.message,
         400
       );
     }
+    console.log("[Upload] Image validation passed");
 
     RemoveBg.logRequest(request, {
       fileName: file.name,
@@ -44,9 +53,25 @@ export async function action({ request }: Route.ActionArgs) {
       );
     }
 
+    console.log("[Upload] Preparing image for API submission");
     const formData = new FormData();
     formData.append("image_file", file);
     formData.append("size", "auto");
+
+    console.log("[Upload] Payload prepared for API:", {
+      endpoint: apiUrl,
+      method: "POST",
+      imageFile: {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+      },
+      parameters: {
+        size: "auto",
+      },
+      hasApiKey: !!BgRemoverAPIKey,
+    });
+    console.log("[Upload] Sending request to Remove.bg API...");
 
     const removeBgResponse = await fetch(apiUrl, {
       method: "POST",
@@ -55,6 +80,7 @@ export async function action({ request }: Route.ActionArgs) {
       },
       body: formData,
     });
+    console.log("[Upload] API response received with status:", removeBgResponse.status);
 
     if (!removeBgResponse.ok) {
       const errorText = await removeBgResponse.text();
@@ -83,7 +109,6 @@ export async function action({ request }: Route.ActionArgs) {
       );
     }
 
-    // Convert response to base64
     const imageBuffer = await removeBgResponse.arrayBuffer();
     const base64 = Buffer.from(imageBuffer).toString("base64");
     const imageBase64 = `data:image/png;base64,${base64}`;
