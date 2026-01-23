@@ -30,25 +30,38 @@ export async function removeBackground(
     });
 
     if (!response.ok) {
-      const errorData: ApiResponse = await response.json();
-      const translatedMessage = translateErrorMessage(
-        errorData.error?.message || "",
-        errorData.error?.code
-      );
-      throw new Error(translatedMessage);
+      // En cas d'erreur, essayer de parser la réponse JSON
+      try {
+        const errorData: ApiResponse = await response.json();
+        const translatedMessage = translateErrorMessage(
+          errorData.error?.message || "",
+          errorData.error?.code
+        );
+        throw new Error(translatedMessage);
+      } catch {
+        throw new Error(errorMessages.GENERIC);
+      }
     }
 
-    const data: ApiResponse<RemoveBackgroundResponse> = await response.json();
+    const imageBlob = await response.blob();
+    const processingTime = parseInt(
+      response.headers.get("X-Processing-Time") || "0"
+    );
+    const formatHeader = response.headers.get("X-Image-Format") || "png";
+    const format = (
+      formatHeader === "jpg" || formatHeader === "webp" ? formatHeader : "png"
+    ) as "png" | "jpg" | "webp";
 
-    if (!data.success || !data.data) {
-      const translatedMessage = translateErrorMessage(
-        data.error?.message || "Failed to process image",
-        data.error?.code
-      );
-      throw new Error(translatedMessage);
-    }
+    const arrayBuffer = await imageBlob.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString("base64");
+    const imageBase64 = `data:image/${format};base64,${base64}`;
 
-    return data.data;
+    return {
+      imageBase64,
+      format,
+      size: imageBlob.size,
+      processingTime,
+    };
   } catch (error) {
     if (error instanceof Error) {
       throw error;

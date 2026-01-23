@@ -1,5 +1,4 @@
 import type { Route } from "./+types/remove-background";
-import type { RemoveBackgroundResponse } from "~/types";
 import { BgRemoverAPIKey } from "~/server/utils/env";
 import * as RemoveBg from "~/server/utils/utils";
 
@@ -129,31 +128,36 @@ export async function action({ request }: Route.ActionArgs) {
         );
       }
 
-      // Pour l'erreur "unknown_foreground", utiliser un code 422 (Unprocessable Entity)
       const statusCode = errorCode === "UNKNOWN_FOREGROUND" ? 422 : 500;
 
       throw RemoveBg.createApiError(errorCode, errorMessage, statusCode);
     }
 
     const imageBuffer = await removeBgResponse.arrayBuffer();
-    const base64 = Buffer.from(imageBuffer).toString("base64");
-    const imageBase64 = `data:image/png;base64,${base64}`;
-
     const processingTime = Date.now() - startTime;
 
-    const response: RemoveBackgroundResponse = {
-      imageBase64,
-      format: "png",
-      size: imageBuffer.byteLength,
-      processingTime,
-    };
+    console.log("[Upload] Image processed successfully:", {
+      size: `${(imageBuffer.byteLength / 1024).toFixed(2)} KB`,
+      processingTime: `${processingTime}ms`,
+    });
 
     RemoveBg.logRequest(request, {
       success: true,
       processingTime: `${processingTime}ms`,
+      outputSize: imageBuffer.byteLength,
     });
 
-    return RemoveBg.successResponse(response);
+    // Retourner l'image directement comme blob pour éviter l'overhead de base64 (~33%)
+    return new Response(imageBuffer, {
+      status: 200,
+      headers: {
+        "Content-Type": "image/png",
+        "Content-Length": imageBuffer.byteLength.toString(),
+        "X-Processing-Time": processingTime.toString(),
+        "X-Image-Format": "png",
+        "Cache-Control": "no-cache",
+      },
+    });
   } catch (error) {
     RemoveBg.logRequest(request, {
       error: error instanceof Error ? error.message : "Unknown error",
