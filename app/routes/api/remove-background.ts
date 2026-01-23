@@ -4,6 +4,11 @@ import { BgRemoverAPIKey, BlobReadWriteToken } from "~/server/utils/env";
 import * as RemoveBg from "~/server/utils/utils";
 import { put } from "@vercel/blob";
 
+// Vercel function configuration
+export const config = {
+  maxDuration: 30,
+};
+
 export async function action({ request }: Route.ActionArgs) {
   const apiUrl = "https://api.remove.bg/v1.0/removebg";
 

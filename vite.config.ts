@@ -10,4 +10,13 @@ export default defineConfig({
       "~": "/app",
     },
   },
+  build: {
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress empty chunk warnings for API-only routes
+        if (warning.code === "EMPTY_BUNDLE") return;
+        warn(warning);
+      },
+    },
+  },
 });
