@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { HeroUIProvider } from "@heroui/react";
-import { ToastProvider } from "~/components/toast/ToastProvider";
+import { ToastProvider } from "~/components/Toast/ToastProvider";
 
 import type { Route } from "./+types/root";
 import "./app.css";
