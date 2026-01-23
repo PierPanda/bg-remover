@@ -31,6 +31,13 @@ export interface RemoveBackgroundRequest {
   image: File;
 }
 
+export interface RemoveBackgroundApiResponse {
+  imageUrl: string;
+  format: "png" | "jpg" | "webp";
+  size: number;
+  processingTime: number;
+}
+
 export interface RemoveBackgroundResponse {
   imageBase64: string;
   format: "png" | "jpg" | "webp";

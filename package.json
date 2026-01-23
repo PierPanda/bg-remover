@@ -18,6 +18,7 @@
     "@iconify/react": "^6.0.2",
     "@react-router/node": "7.10.1",
     "@react-router/serve": "7.10.1",
+    "@vercel/blob": "^2.0.1",
     "@vercel/react-router": "^1.2.4",
     "framer-motion": "^12.23.26",
     "isbot": "^5.1.31",

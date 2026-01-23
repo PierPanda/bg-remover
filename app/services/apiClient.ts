@@ -1,19 +1,14 @@
-import type { ApiResponse, RemoveBackgroundResponse } from "~/types";
+import type { ApiResponse, RemoveBackgroundResponse, RemoveBackgroundApiResponse } from "~/types";
 import { errorMessages, type ErrorCode } from "~/constants";
 
-/**
- * Traduit un message d'erreur de l'API en message utilisateur
- */
 function translateErrorMessage(
   errorMessage: string,
   errorCode?: string
 ): string {
-  // Essayer de mapper le code d'erreur aux messages traduits
   if (errorCode && errorCode in errorMessages) {
     return errorMessages[errorCode as ErrorCode];
   }
 
-  // Sinon, retourner le message original ou un message générique
   return errorMessage || errorMessages.GENERIC;
 }
 
@@ -42,24 +37,28 @@ export async function removeBackground(
       }
     }
 
-    const imageBlob = await response.blob();
-    const processingTime = parseInt(
-      response.headers.get("X-Processing-Time") || "0"
-    );
-    const formatHeader = response.headers.get("X-Image-Format") || "png";
-    const format = (
-      formatHeader === "jpg" || formatHeader === "webp" ? formatHeader : "png"
-    ) as "png" | "jpg" | "webp";
+    const data: ApiResponse<RemoveBackgroundApiResponse> = await response.json();
 
+    if (!data.success || !data.data) {
+      const translatedMessage = translateErrorMessage(
+        data.error?.message || "Failed to process image",
+        data.error?.code
+      );
+      throw new Error(translatedMessage);
+    }
+
+    // Télécharger l'image depuis Vercel Blob et la convertir en base64 pour l'affichage
+    const imageResponse = await fetch(data.data.imageUrl);
+    const imageBlob = await imageResponse.blob();
     const arrayBuffer = await imageBlob.arrayBuffer();
     const base64 = Buffer.from(arrayBuffer).toString("base64");
-    const imageBase64 = `data:image/${format};base64,${base64}`;
+    const imageBase64 = `data:image/${data.data.format};base64,${base64}`;
 
     return {
       imageBase64,
-      format,
-      size: imageBlob.size,
-      processingTime,
+      format: data.data.format,
+      size: data.data.size,
+      processingTime: data.data.processingTime,
     };
   } catch (error) {
     if (error instanceof Error) {

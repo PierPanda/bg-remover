@@ -1,7 +1,8 @@
 import type { Route } from "./+types/remove-background";
-import type { RemoveBackgroundResponse } from "~/types";
+import type { RemoveBackgroundApiResponse } from "~/types";
 import { BgRemoverAPIKey } from "~/server/utils/env";
 import * as RemoveBg from "~/server/utils/utils";
+import { put } from "@vercel/blob";
 
 export async function action({ request }: Route.ActionArgs) {
   const apiUrl = "https://api.remove.bg/v1.0/removebg";
@@ -136,13 +137,22 @@ export async function action({ request }: Route.ActionArgs) {
     }
 
     const imageBuffer = await removeBgResponse.arrayBuffer();
-    const base64 = Buffer.from(imageBuffer).toString("base64");
-    const imageBase64 = `data:image/png;base64,${base64}`;
+
+    console.log("[Upload] Uploading processed image to Vercel Blob...");
+
+    // Upload vers Vercel Blob avec un nom unique
+    const filename = `processed-${Date.now()}.png`;
+    const blob = await put(filename, imageBuffer, {
+      access: "public",
+      contentType: "image/png",
+    });
+
+    console.log("[Upload] Image uploaded to Vercel Blob:", blob.url);
 
     const processingTime = Date.now() - startTime;
 
-    const response: RemoveBackgroundResponse = {
-      imageBase64,
+    const response: RemoveBackgroundApiResponse = {
+      imageUrl: blob.url,
       format: "png",
       size: imageBuffer.byteLength,
       processingTime,
@@ -151,6 +161,7 @@ export async function action({ request }: Route.ActionArgs) {
     RemoveBg.logRequest(request, {
       success: true,
       processingTime: `${processingTime}ms`,
+      blobUrl: blob.url,
     });
 
     return RemoveBg.successResponse(response);
