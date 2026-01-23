@@ -1,4 +1,21 @@
 import type { ApiResponse, RemoveBackgroundResponse } from "~/types";
+import { errorMessages, type ErrorCode } from "~/constants";
+
+/**
+ * Traduit un message d'erreur de l'API en message utilisateur
+ */
+function translateErrorMessage(
+  errorMessage: string,
+  errorCode?: string
+): string {
+  // Essayer de mapper le code d'erreur aux messages traduits
+  if (errorCode && errorCode in errorMessages) {
+    return errorMessages[errorCode as ErrorCode];
+  }
+
+  // Sinon, retourner le message original ou un message générique
+  return errorMessage || errorMessages.GENERIC;
+}
 
 export async function removeBackground(
   imageFile: File
@@ -14,15 +31,21 @@ export async function removeBackground(
 
     if (!response.ok) {
       const errorData: ApiResponse = await response.json();
-      throw new Error(
-        errorData.error?.message || `HTTP error! status: ${response.status}`
+      const translatedMessage = translateErrorMessage(
+        errorData.error?.message || "",
+        errorData.error?.code
       );
+      throw new Error(translatedMessage);
     }
 
     const data: ApiResponse<RemoveBackgroundResponse> = await response.json();
 
     if (!data.success || !data.data) {
-      throw new Error(data.error?.message || "Failed to process image");
+      const translatedMessage = translateErrorMessage(
+        data.error?.message || "Failed to process image",
+        data.error?.code
+      );
+      throw new Error(translatedMessage);
     }
 
     return data.data;
@@ -30,7 +53,7 @@ export async function removeBackground(
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error("An unknown error occurred while processing the image");
+    throw new Error(errorMessages.GENERIC);
   }
 }
 

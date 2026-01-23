@@ -80,11 +80,38 @@ export async function action({ request }: Route.ActionArgs) {
       },
       body: formData,
     });
-    console.log("[Upload] API response received with status:", removeBgResponse.status);
+    console.log(
+      "[Upload] API response received with status:",
+      removeBgResponse.status
+    );
 
     if (!removeBgResponse.ok) {
       const errorText = await removeBgResponse.text();
       console.error("Remove.bg API error:", errorText);
+
+      let errorMessage = "Failed to remove background from image";
+      let errorCode = "PROCESSING_FAILED";
+
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.errors && errorData.errors.length > 0) {
+          const firstError = errorData.errors[0];
+          errorMessage = firstError.title || errorMessage;
+          errorCode = firstError.code?.toUpperCase() || errorCode;
+
+          console.error(
+            "[API Error] Code:",
+            errorCode,
+            "Message:",
+            errorMessage
+          );
+        }
+      } catch (parseError) {
+        console.error(
+          "[API Error] Could not parse error response:",
+          parseError
+        );
+      }
 
       if (removeBgResponse.status === 402) {
         throw RemoveBg.createApiError(
@@ -102,11 +129,10 @@ export async function action({ request }: Route.ActionArgs) {
         );
       }
 
-      throw RemoveBg.createApiError(
-        "PROCESSING_FAILED",
-        "Failed to remove background from image",
-        500
-      );
+      // Pour l'erreur "unknown_foreground", utiliser un code 422 (Unprocessable Entity)
+      const statusCode = errorCode === "UNKNOWN_FOREGROUND" ? 422 : 500;
+
+      throw RemoveBg.createApiError(errorCode, errorMessage, statusCode);
     }
 
     const imageBuffer = await removeBgResponse.arrayBuffer();
