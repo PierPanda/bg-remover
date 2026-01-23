@@ -132,3 +132,20 @@ export const imagePreviewContent = {
     settings: "lucide:settings",
   },
 };
+
+export const errorMessages = {
+  UNKNOWN_FOREGROUND:
+    "Impossible d'identifier le sujet principal de l'image. Assurez-vous que l'image contient un sujet clairement défini (personne, objet, animal, etc.) avec un contraste suffisant par rapport à l'arrière-plan.",
+  QUOTA_EXCEEDED:
+    "La limite d'utilisation de l'API a été atteinte. Veuillez réessayer plus tard.",
+  INVALID_API_KEY:
+    "Erreur de configuration de l'API. Veuillez contacter le support.",
+  PROCESSING_FAILED: "Impossible de traiter l'image. Veuillez réessayer.",
+  METHOD_NOT_ALLOWED: "Méthode non autorisée.",
+  INVALID_FILE_TYPE: "Type de fichier invalide.",
+  FILE_TOO_LARGE: "Le fichier est trop volumineux.",
+  CONFIGURATION_ERROR: "Erreur de configuration du serveur.",
+  GENERIC: "Une erreur est survenue lors du traitement de l'image.",
+} as const;
+
+export type ErrorCode = keyof typeof errorMessages;

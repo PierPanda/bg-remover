@@ -29,7 +29,6 @@ export default function ExportOptions({
   };
 
   const getFileSize = () => {
-    // Estimation approximative de la taille du fichier
     const base64Length = imageBase64.split(",")[1]?.length || 0;
     const sizeInBytes = (base64Length * 3) / 4;
 
