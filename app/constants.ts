@@ -21,7 +21,7 @@ export const dropzoneContent = {
   invalidFileTypeError:
     "Invalid file type. Please upload a JPG, PNG, or WEBP image.",
   supportedFormats: "Supported formats: PNG, JPG, JPEG, WebP",
-  maxFileSize: "Maximum file size is 10MB.",
+  maxFileSize: "Maximum file size is 1MB.",
 };
 
 export const previewBtnText = {

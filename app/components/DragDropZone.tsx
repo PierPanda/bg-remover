@@ -33,7 +33,7 @@ export default function DragDropZone({
       "image/jpeg": [".jpg", ".jpeg"],
       "image/webp": [".webp"],
     },
-    maxSize: 10 * 1024 * 1024, // 10MB
+    maxSize: 1 * 1024 * 1024, // 1MB
     multiple: false,
     disabled,
   });

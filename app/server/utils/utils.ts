@@ -90,7 +90,7 @@ export function handleApiError(error: unknown): Response {
 }
 
 const DEFAULT_VALIDATION_CONFIG: FileValidationConfig = {
-  maxSizeBytes: 10 * 1024 * 1024, // 10MB
+  maxSizeBytes: 1 * 1024 * 1024, // 1MB
   allowedMimeTypes: ["image/png", "image/jpeg", "image/jpg", "image/webp"],
   allowedExtensions: [".png", ".jpg", ".jpeg", ".webp"],
 };
