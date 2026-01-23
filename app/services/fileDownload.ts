@@ -63,7 +63,22 @@ export async function downloadImage(
     const timestamp = Date.now();
     const filename = `bg-removed-${timestamp}.${format}`;
 
-    // Si c'est un blob URL ou si on garde le format PNG par défaut, télécharger directement
+    if (imageUrl.startsWith("https://") && format === "png") {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 3000);
+      return;
+    }
+
     if (imageUrl.startsWith("blob:") && format === "png") {
       const link = document.createElement("a");
       link.href = imageUrl;
@@ -74,8 +89,11 @@ export async function downloadImage(
       return;
     }
 
-    // Sinon, convertir le format
-    const convertedDataUrl = await convertImageFormat(imageUrl, format, quality);
+    const convertedDataUrl = await convertImageFormat(
+      imageUrl,
+      format,
+      quality
+    );
 
     const link = document.createElement("a");
     link.href = convertedDataUrl;
