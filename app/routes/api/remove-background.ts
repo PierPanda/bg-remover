@@ -1,6 +1,10 @@
 import type { Route } from "./+types/remove-background";
 import type { RemoveBackgroundApiResponse } from "~/types";
-import { BgRemoverAPIKey, BlobReadWriteToken } from "~/server/utils/env";
+import {
+  BgRemoverAPIKey,
+  BlobReadWriteToken,
+  NodeEnv,
+} from "~/server/utils/env";
 import * as RemoveBg from "~/server/utils/utils";
 import { put } from "@vercel/blob";
 
@@ -269,7 +273,21 @@ export async function action({ request }: Route.ActionArgs) {
     console.log("[Upload] Uploading processed image to Vercel Blob...");
 
     if (!BlobReadWriteToken) {
-      console.error("[Upload] BLOB_READ_WRITE_TOKEN not configured");
+      if (NodeEnv === "development") {
+        const buffer = Buffer.from(imageBuffer);
+        const base64 = buffer.toString("base64");
+
+        const processingTime = Date.now() - startTime;
+        const response: RemoveBackgroundApiResponse = {
+          imageUrl: `data:image/png;base64,${base64}`,
+          format: "png",
+          size: imageBuffer.byteLength,
+          processingTime,
+        };
+
+        return RemoveBg.successResponse(response);
+      }
+
       throw RemoveBg.createApiError(
         "CONFIGURATION_ERROR",
         "Vercel Blob token not configured",
