@@ -4,17 +4,14 @@ import { BgRemoverAPIKey, BlobReadWriteToken } from "~/server/utils/env";
 import * as RemoveBg from "~/server/utils/utils";
 import { put } from "@vercel/blob";
 
-// Vercel function configuration
 export const config = {
-  maxDuration: 60, // Increased to 60s for slow networks
+  maxDuration: 60,
 };
 
-// Timeout and retry configuration
-const REMOVE_BG_TIMEOUT_MS = 25000; // 25 seconds timeout for remove.bg API
-const MAX_RETRIES = 2; // Maximum retry attempts for transient errors
-const RETRY_DELAY_MS = 1000; // Base delay between retries (exponential backoff)
+const REMOVE_BG_TIMEOUT_MS = 25000;
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 1000;
 
-// Helper to create a fetch with timeout using AbortController
 async function fetchWithTimeout(
   url: string,
   options: RequestInit,
@@ -34,11 +31,8 @@ async function fetchWithTimeout(
   }
 }
 
-// Helper for delay with exponential backoff
-const delay = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Check if error is retryable (network issues, timeouts)
 function isRetryableError(error: unknown): boolean {
   if (error instanceof Error) {
     return (

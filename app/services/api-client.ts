@@ -5,8 +5,7 @@ import type {
 } from "~/types";
 import { errorMessages, type ErrorCode } from "~/constants";
 
-// Client-side timeout (slightly less than server timeout to get server errors first)
-const CLIENT_TIMEOUT_MS = 55000; // 55 seconds
+const CLIENT_TIMEOUT_MS = 55000;
 
 function translateErrorMessage(
   errorMessage: string,
@@ -19,7 +18,6 @@ function translateErrorMessage(
   return errorMessage || errorMessages.GENERIC;
 }
 
-// Helper for fetch with timeout
 async function fetchWithTimeout(
   url: string,
   options: RequestInit,
@@ -87,7 +85,6 @@ export async function removeBackground(
     };
   } catch (error) {
     if (error instanceof Error) {
-      // Handle timeout errors specifically
       if (error.name === "AbortError") {
         throw new Error(errorMessages.TIMEOUT);
       }

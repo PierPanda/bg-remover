@@ -30,7 +30,6 @@ export default function Home() {
   const [error, setError] = React.useState<string | null>(null);
   const { addToast } = useToast();
 
-  // Nettoyer les blob URLs quand le composant est démonté
   React.useEffect(() => {
     return () => {
       if (currentImage && currentImage.startsWith("blob:")) {
