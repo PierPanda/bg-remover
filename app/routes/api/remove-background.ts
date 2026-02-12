@@ -8,8 +8,8 @@ export const config = {
   maxDuration: 60,
 };
 
-const REMOVE_BG_TIMEOUT_MS = 25000;
-const MAX_RETRIES = 2;
+const REMOVE_BG_TIMEOUT_MS = 18000;
+const MAX_RETRIES = 1;
 const RETRY_DELAY_MS = 1000;
 
 async function fetchWithTimeout(
@@ -33,13 +33,26 @@ async function fetchWithTimeout(
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+function isAbortError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    (error as { name?: unknown }).name === "AbortError"
+  );
+}
+
 function isRetryableError(error: unknown): boolean {
+  if (isAbortError(error)) {
+    return true;
+  }
+
   if (error instanceof Error) {
+    const message = error.message.toLowerCase();
     return (
-      error.name === "AbortError" ||
-      error.message.includes("network") ||
-      error.message.includes("ECONNRESET") ||
-      error.message.includes("ETIMEDOUT")
+      message.includes("network") ||
+      message.includes("econnreset") ||
+      message.includes("etimedout")
     );
   }
   return false;

@@ -84,10 +84,20 @@ export async function removeBackground(
       processingTime: data.data.processingTime,
     };
   } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "name" in error &&
+      (error as { name?: unknown }).name === "AbortError"
+    ) {
+      throw new Error(errorMessages.TIMEOUT);
+    }
+
+    if (error instanceof TypeError) {
+      throw new Error(errorMessages.NETWORK_ERROR);
+    }
+
     if (error instanceof Error) {
-      if (error.name === "AbortError") {
-        throw new Error(errorMessages.TIMEOUT);
-      }
       throw error;
     }
     throw new Error(errorMessages.GENERIC);
