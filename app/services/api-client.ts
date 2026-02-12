@@ -5,6 +5,9 @@ import type {
 } from "~/types";
 import { errorMessages, type ErrorCode } from "~/constants";
 
+// Client-side timeout (slightly less than server timeout to get server errors first)
+const CLIENT_TIMEOUT_MS = 55000; // 55 seconds
+
 function translateErrorMessage(
   errorMessage: string,
   errorCode?: string
@@ -16,6 +19,26 @@ function translateErrorMessage(
   return errorMessage || errorMessages.GENERIC;
 }
 
+// Helper for fetch with timeout
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit,
+  timeoutMs: number
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 export async function removeBackground(
   imageFile: File
 ): Promise<RemoveBackgroundResponse> {
@@ -23,10 +46,14 @@ export async function removeBackground(
     const formData = new FormData();
     formData.append("image", imageFile);
 
-    const response = await fetch("/api/remove-background", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await fetchWithTimeout(
+      "/api/remove-background",
+      {
+        method: "POST",
+        body: formData,
+      },
+      CLIENT_TIMEOUT_MS
+    );
 
     if (!response.ok) {
       try {
@@ -60,6 +87,10 @@ export async function removeBackground(
     };
   } catch (error) {
     if (error instanceof Error) {
+      // Handle timeout errors specifically
+      if (error.name === "AbortError") {
+        throw new Error(errorMessages.TIMEOUT);
+      }
       throw error;
     }
     throw new Error(errorMessages.GENERIC);
