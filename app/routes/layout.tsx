@@ -1,10 +1,13 @@
+import { Navbar, NavbarBrand, NavbarContent } from "@heroui/react";
 import { Outlet } from "react-router";
 import Footer from "~/components/Footer";
+import Logo from "~/assets/logo.png";
+import { nav } from "~/constants";
 
 export default function App() {
   return (
     <div className="flex flex-col min-h-screen w-full bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
-      {/* <Navbar
+      <Navbar
         isBlurred
         maxWidth="full"
         classNames={{
@@ -14,12 +17,11 @@ export default function App() {
         <NavbarContent justify="start">
           <NavbarBrand className="gap-4 w-full">
             <div className="flex items-center justify-between gap-4">
-              <img src={Logo} alt="Logo" className="h-12 w-12" />
-              <p className="font-bold text-inherit">{nav.brandName}</p>
+              <img src={Logo} alt="Logo" className="h-24 w-24" />
             </div>
           </NavbarBrand>
         </NavbarContent>
-      </Navbar> */}
+      </Navbar>
 
       <main className="flex-1">
         <Outlet />
