@@ -145,6 +145,10 @@ export const errorMessages = {
   INVALID_FILE_TYPE: "Type de fichier invalide.",
   FILE_TOO_LARGE: "Le fichier est trop volumineux.",
   CONFIGURATION_ERROR: "Erreur de configuration du serveur.",
+  TIMEOUT:
+    "La requête a pris trop de temps. Votre connexion semble lente. Veuillez réessayer.",
+  NETWORK_ERROR:
+    "Erreur de connexion réseau. Vérifiez votre connexion internet et réessayez.",
   GENERIC: "Une erreur est survenue lors du traitement de l'image.",
 } as const;
 

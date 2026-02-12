@@ -5,6 +5,8 @@ import type {
 } from "~/types";
 import { errorMessages, type ErrorCode } from "~/constants";
 
+const CLIENT_TIMEOUT_MS = 55000;
+
 function translateErrorMessage(
   errorMessage: string,
   errorCode?: string
@@ -16,6 +18,25 @@ function translateErrorMessage(
   return errorMessage || errorMessages.GENERIC;
 }
 
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit,
+  timeoutMs: number
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 export async function removeBackground(
   imageFile: File
 ): Promise<RemoveBackgroundResponse> {
@@ -23,10 +44,14 @@ export async function removeBackground(
     const formData = new FormData();
     formData.append("image", imageFile);
 
-    const response = await fetch("/api/remove-background", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await fetchWithTimeout(
+      "/api/remove-background",
+      {
+        method: "POST",
+        body: formData,
+      },
+      CLIENT_TIMEOUT_MS
+    );
 
     if (!response.ok) {
       try {
@@ -59,6 +84,19 @@ export async function removeBackground(
       processingTime: data.data.processingTime,
     };
   } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "name" in error &&
+      (error as { name?: unknown }).name === "AbortError"
+    ) {
+      throw new Error(errorMessages.TIMEOUT);
+    }
+
+    if (error instanceof TypeError) {
+      throw new Error(errorMessages.NETWORK_ERROR);
+    }
+
     if (error instanceof Error) {
       throw error;
     }

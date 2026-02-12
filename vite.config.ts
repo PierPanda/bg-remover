@@ -1,3 +1,4 @@
+import path from "path";
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
@@ -7,13 +8,12 @@ export default defineConfig({
   plugins: [tsconfigPaths(), tailwindcss(), reactRouter()],
   resolve: {
     alias: {
-      "~": "/app",
+      "~": path.resolve(__dirname, "app"),
     },
   },
   build: {
     rollupOptions: {
       onwarn(warning, warn) {
-        // Suppress empty chunk warnings for API-only routes
         if (warning.code === "EMPTY_BUNDLE") return;
         warn(warning);
       },

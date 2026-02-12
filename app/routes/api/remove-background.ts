@@ -4,10 +4,59 @@ import { BgRemoverAPIKey, BlobReadWriteToken } from "~/server/utils/env";
 import * as RemoveBg from "~/server/utils/utils";
 import { put } from "@vercel/blob";
 
-// Vercel function configuration
 export const config = {
-  maxDuration: 30,
+  maxDuration: 60,
 };
+
+const REMOVE_BG_TIMEOUT_MS = 18000;
+const MAX_RETRIES = 1;
+const RETRY_DELAY_MS = 1000;
+
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit,
+  timeoutMs: number
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function isAbortError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    (error as { name?: unknown }).name === "AbortError"
+  );
+}
+
+function isRetryableError(error: unknown): boolean {
+  if (isAbortError(error)) {
+    return true;
+  }
+
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    return (
+      message.includes("network") ||
+      message.includes("econnreset") ||
+      message.includes("etimedout")
+    );
+  }
+  return false;
+}
 
 export async function action({ request }: Route.ActionArgs) {
   const apiUrl = "https://api.remove.bg/v1.0/removebg";
@@ -81,13 +130,86 @@ export async function action({ request }: Route.ActionArgs) {
     });
     console.log("[Upload] Sending request to Remove.bg API...");
 
-    const removeBgResponse = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "X-Api-Key": BgRemoverAPIKey,
-      },
-      body: formData,
-    });
+    // Fetch with timeout and retry logic for resilience on slow networks
+    let removeBgResponse: Response | null = null;
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        if (attempt > 0) {
+          const backoffDelay = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
+          console.log(
+            `[Upload] Retry attempt ${attempt}/${MAX_RETRIES} after ${backoffDelay}ms`
+          );
+          await delay(backoffDelay);
+
+          // Recreate FormData for retry (body is consumed by previous attempt)
+          const retryFormData = new FormData();
+          retryFormData.append("image_file", file);
+          retryFormData.append("size", "auto");
+
+          removeBgResponse = await fetchWithTimeout(
+            apiUrl,
+            {
+              method: "POST",
+              headers: { "X-Api-Key": BgRemoverAPIKey },
+              body: retryFormData,
+            },
+            REMOVE_BG_TIMEOUT_MS
+          );
+        } else {
+          removeBgResponse = await fetchWithTimeout(
+            apiUrl,
+            {
+              method: "POST",
+              headers: { "X-Api-Key": BgRemoverAPIKey },
+              body: formData,
+            },
+            REMOVE_BG_TIMEOUT_MS
+          );
+        }
+        // Request succeeded, exit retry loop
+        break;
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+
+        if (lastError.name === "AbortError") {
+          console.error(
+            `[Upload] Request timeout after ${REMOVE_BG_TIMEOUT_MS}ms (attempt ${attempt + 1}/${MAX_RETRIES + 1})`
+          );
+        } else {
+          console.error(
+            `[Upload] Network error (attempt ${attempt + 1}/${MAX_RETRIES + 1}):`,
+            lastError.message
+          );
+        }
+
+        // Only retry on retryable errors and if we have not exhausted attempts
+        if (!isRetryableError(error) || attempt === MAX_RETRIES) {
+          if (lastError.name === "AbortError") {
+            throw RemoveBg.createApiError(
+              "TIMEOUT",
+              "Request timed out. The server took too long to respond. Please try again.",
+              504
+            );
+          }
+          throw RemoveBg.createApiError(
+            "NETWORK_ERROR",
+            "Network error occurred. Please check your connection and try again.",
+            503
+          );
+        }
+      }
+    }
+
+    if (!removeBgResponse) {
+      throw RemoveBg.createApiError(
+        "NETWORK_ERROR",
+        "Failed to connect to the processing server after multiple attempts.",
+        503
+      );
+    }
+
     console.log(
       "[Upload] API response received with status:",
       removeBgResponse.status

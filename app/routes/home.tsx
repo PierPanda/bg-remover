@@ -1,13 +1,13 @@
 import * as React from "react";
 import { homeContent } from "~/constants";
-import DragDropZone from "~/components/DragDropZone";
-import LoadingSpinner from "~/components/LoadingSpinner";
-import { removeBackground } from "~/services/apiClient";
-import { downloadImage } from "~/services/fileDownload";
-import { useToast } from "~/hooks/useToast";
+import DragDropZone from "~/components/drag-drop-zone";
+import LoadingSpinner from "~/components/loading-spinner";
+import { removeBackground } from "~/services/api-client";
+import { downloadImage } from "~/services/file-download";
+import { useToast } from "~/hooks/use-toast";
 import type { ProcessingState } from "~/types";
 
-const ImagePreview = React.lazy(() => import("~/components/ImagePreview"));
+const ImagePreview = React.lazy(() => import("~/components/image-preview"));
 
 export function meta() {
   return [
@@ -30,7 +30,6 @@ export default function Home() {
   const [error, setError] = React.useState<string | null>(null);
   const { addToast } = useToast();
 
-  // Nettoyer les blob URLs quand le composant est démonté
   React.useEffect(() => {
     return () => {
       if (currentImage && currentImage.startsWith("blob:")) {

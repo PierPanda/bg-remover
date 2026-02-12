@@ -5,7 +5,7 @@ import {
   imagePreviewContent,
   type ExportFormatValue,
 } from "~/constants";
-import ExportOptions from "./ExportOptions";
+import ExportOptions from "./export-options";
 import * as React from "react";
 
 type ExportFormat = ExportFormatValue;

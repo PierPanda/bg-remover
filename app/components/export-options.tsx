@@ -29,8 +29,6 @@ export default function ExportOptions({
   };
 
   const getFileSize = () => {
-    // Estimation approximative basée sur le format
-    // Pour une meilleure précision, il faudrait charger l'image
     const estimatedBaseSizeKB = 500;
 
     let estimatedSize = estimatedBaseSizeKB;
