@@ -1,6 +1,6 @@
 import { Navbar, NavbarBrand, NavbarContent } from "@heroui/react";
 import { Outlet } from "react-router";
-import Footer from "~/components/Footer";
+import Footer from "~/components/footer";
 import Logo from "~/assets/logo.png";
 import { nav } from "~/constants";
 
