@@ -1,5 +1,4 @@
 import * as React from "react";
-<<<<<<< HEAD
 import { Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { homeContent, landingContent } from "~/constants";
@@ -8,15 +7,7 @@ import LoadingSpinner from "~/components/loading-spinner";
 import { removeBackground } from "~/services/api-client";
 import { downloadImage } from "~/services/file-download";
 import { useToast } from "~/hooks/use-toast";
-=======
-import { homeContent } from "~/constants";
-import DragDropZone from "~/components/DragDropZone";
-import LoadingSpinner from "~/components/LoadingSpinner";
-import { removeBackground } from "~/services/apiClient";
-import { downloadImage } from "~/services/fileDownload";
-import { useToast } from "~/hooks/useToast";
 import { composeImageWithBackground } from "~/services/imageComposer";
->>>>>>> c7013c4 (feat: add ImageBackground superposition after removing it)
 import type { ProcessingState } from "~/types";
 
 const ImagePreview = React.lazy(() => import("~/components/image-preview"));
@@ -131,10 +122,6 @@ export default function Home() {
   };
 
   const handleReset = () => {
-<<<<<<< HEAD
-=======
-    // Libérer les blob URLs avant de réinitialiser
->>>>>>> c7013c4 (feat: add ImageBackground superposition after removing it)
     if (currentImage && currentImage.startsWith("blob:")) {
       window.URL.revokeObjectURL(currentImage);
     }
