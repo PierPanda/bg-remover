@@ -177,7 +177,7 @@ export default function Home() {
       <section
         ref={toolSectionRef}
         id="tool-section"
-        className="min-h-screen overflow-hidden pt-20 pb-20"
+        className="min-h-screen overflow-hidden pt-20"
       >
         <div className="mx-auto px-4">
           <div className="mx-auto">
