@@ -1,5 +1,7 @@
 import * as React from "react";
-import { homeContent } from "~/constants";
+import { Button } from "@heroui/react";
+import { Icon } from "@iconify/react";
+import { homeContent, landingContent } from "~/constants";
 import DragDropZone from "~/components/drag-drop-zone";
 import LoadingSpinner from "~/components/loading-spinner";
 import { removeBackground } from "~/services/api-client";
@@ -29,6 +31,7 @@ export default function Home() {
     React.useState<ProcessingState>("idle");
   const [error, setError] = React.useState<string | null>(null);
   const { addToast } = useToast();
+  const toolSectionRef = React.useRef<HTMLElement>(null);
 
   React.useEffect(() => {
     return () => {
@@ -79,7 +82,6 @@ export default function Home() {
   };
 
   const handleReset = () => {
-    // Libérer la blob URL avant de réinitialiser
     if (currentImage && currentImage.startsWith("blob:")) {
       window.URL.revokeObjectURL(currentImage);
     }
@@ -89,17 +91,54 @@ export default function Home() {
     setError(null);
   };
 
+  const scrollToTool = () => {
+    toolSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="flex flex-col">
-      <section className="min-h-screen overflow-hidden pt-32 pb-20">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <div className="mx-auto max-w-6xl px-4 py-20 text-center">
+          <h1 className="animate-fade-in-up mb-6 text-5xl font-bold leading-tight md:text-7xl lg:text-8xl [animation-delay:100ms]">
+            <span className="text-gray-900 dark:text-white">
+              {landingContent.hero.title}
+            </span>
+            <br />
+            <span className="bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              {landingContent.hero.titleHighlight}
+            </span>
+          </h1>
+
+          <p className="animate-fade-in-up mx-auto mb-10 max-w-2xl text-lg text-gray-600 dark:text-gray-400 md:text-xl [animation-delay:200ms]">
+            {landingContent.hero.description}
+          </p>
+
+          <div className="animate-fade-in-up [animation-delay:300ms]">
+            <Button
+              size="lg"
+              isIconOnly
+              onPress={scrollToTool}
+              className="bg-linear-to-r rounded-full from-blue-600 to-purple-600 text-white shadow-lg transition-transform hover:scale-105"
+            >
+              <Icon icon={landingContent.hero.ctaIcon} width={24} />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section
+        ref={toolSectionRef}
+        id="tool-section"
+        className="min-h-screen overflow-hidden pt-20 pb-20"
+      >
         <div className="mx-auto px-4">
           <div className="mx-auto">
             <div className="text-center mb-12">
-              <h1 className="mb-6 animate-fade-in-up bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-5xl font-bold text-transparent md:text-7xl leading-tight">
+              <h2 className="mb-6 animate-fade-in-up bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-4xl font-bold text-transparent md:text-5xl leading-tight">
                 {homeContent.title}
-              </h1>
+              </h2>
 
-              <p className="animate-fade-in-up text-lg text-gray-700/50 dark:text-gray-300 md:text-xl [animation-delay:100ms] max-w-3xl mx-auto">
+              <p className="animate-fade-in-up text-lg text-gray-600 dark:text-gray-400 md:text-xl [animation-delay:100ms] max-w-3xl mx-auto">
                 {homeContent.description}
               </p>
             </div>

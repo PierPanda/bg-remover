@@ -1,8 +1,8 @@
-import { Navbar, NavbarBrand, NavbarContent } from "@heroui/react";
+import { Navbar, NavbarBrand, NavbarContent, Link } from "@heroui/react";
 import { Outlet } from "react-router";
 import Footer from "~/components/footer";
 import Logo from "~/assets/logo.png";
-import { nav } from "~/constants";
+import { Icon } from "@iconify/react";
 
 export default function App() {
   return (
@@ -16,10 +16,28 @@ export default function App() {
       >
         <NavbarContent justify="start">
           <NavbarBrand className="gap-4 w-full">
-            <div className="flex items-center justify-between gap-4">
+            <Link href="/" className="flex items-center justify-between gap-4">
               <img src={Logo} alt="Logo" className="h-24 w-24" />
-            </div>
+            </Link>
           </NavbarBrand>
+        </NavbarContent>
+        <NavbarContent justify="center" className="hidden lg:flex">
+          <div className="flex gap-4">
+            <Link
+              href="https://github.com/PierPanda"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Icon icon="lucide:github" width={24} height={24} />
+            </Link>
+            <Link
+              href="https://www.linkedin.com/in/pierre-bermudez-b6247891/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Icon icon="lucide:linkedin" width={24} height={24} />
+            </Link>
+          </div>
         </NavbarContent>
       </Navbar>
 

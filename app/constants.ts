@@ -8,6 +8,18 @@ export const homeContent = {
     "Transform your images in seconds with our powerful AI-powered background remover. No signup required, completely free to use.",
 };
 
+export const landingContent = {
+  hero: {
+    badge: "AI-Powered",
+    title: "Remove Image Backgrounds",
+    titleHighlight: "in Seconds",
+    description:
+      "Professional background removal. Perfect for e-commerce, social media, presentations or just for fun.",
+    cta: "Try",
+    ctaIcon: "lucide:arrow-down",
+  },
+};
+
 export const footerContent = {
   githubUrl: "https://github.com/PierPanda",
   linkedinUrl: "https://www.linkedin.com/in/pierre-bermudez-b6247891/",
