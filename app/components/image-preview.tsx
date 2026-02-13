@@ -14,21 +14,41 @@ type ViewMode = "side-by-side" | "compare";
 interface ImagePreviewProps {
   originalImage: string;
   processedImage: string | null;
+  composedImage: string | null;
   onDownload: (format: ExportFormat, quality?: number) => void;
   onReset: () => void;
+  onBackgroundSelect: (file: File) => void;
 }
 
 export default function ImagePreview({
   originalImage,
   processedImage,
+  composedImage,
   onDownload,
   onReset,
+  onBackgroundSelect,
 }: ImagePreviewProps) {
   const [showExportOptions, setShowExportOptions] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<ViewMode>("side-by-side");
   const [sliderPosition, setSliderPosition] = React.useState(50);
   const [isDragging, setIsDragging] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleAddBackgroundClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        alert("Please select a valid image file");
+        return;
+      }
+      onBackgroundSelect(file);
+    }
+  };
 
   const handleQuickDownload = () => {
     onDownload("png");
@@ -250,6 +270,32 @@ export default function ImagePreview({
         ? renderCompareView()
         : renderSideBySideView()}
 
+      {composedImage && (
+        <Card className="mx-auto max-w-2xl">
+          <CardBody className="p-0">
+            <div className="relative">
+              <div className="absolute left-4 top-4 z-10 rounded-lg bg-linear-to-r from-green-600 to-teal-600 px-3 py-1 text-sm font-semibold text-white backdrop-blur-sm">
+                {imagePreviewContent.labels.withBackground}
+              </div>
+              <img
+                src={composedImage}
+                alt={imagePreviewContent.labels.withBackground}
+                className="h-auto w-full rounded-lg object-contain"
+                style={{ maxHeight: "400px" }}
+              />
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
       <div className="flex flex-wrap items-center justify-center gap-4">
         <Button
           color="primary"
@@ -261,6 +307,19 @@ export default function ImagePreview({
         >
           {previewBtnText.download.text}
         </Button>
+
+        {processedImage && (
+          <Button
+            color="success"
+            variant="bordered"
+            size="lg"
+            onPress={handleAddBackgroundClick}
+            startContent={<Icon icon={previewBtnText.addBackground.icon} />}
+            className="font-semibold"
+          >
+            {previewBtnText.addBackground.text}
+          </Button>
+        )}
 
         <Button
           color="secondary"
@@ -288,7 +347,7 @@ export default function ImagePreview({
 
       {showExportOptions && processedImage && (
         <ExportOptions
-          imageUrl={processedImage}
+          imageUrl={composedImage || processedImage}
           onDownload={handleExportDownload}
         />
       )}

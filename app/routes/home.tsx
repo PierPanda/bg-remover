@@ -7,6 +7,7 @@ import LoadingSpinner from "~/components/loading-spinner";
 import { removeBackground } from "~/services/api-client";
 import { downloadImage } from "~/services/file-download";
 import { useToast } from "~/hooks/use-toast";
+import { composeImageWithBackground } from "~/services/imageComposer";
 import type { ProcessingState } from "~/types";
 
 const ImagePreview = React.lazy(() => import("~/components/image-preview"));
@@ -27,6 +28,10 @@ export default function Home() {
   const [processedImage, setProcessedImage] = React.useState<string | null>(
     null
   );
+  const [customBackground, setCustomBackground] = React.useState<string | null>(
+    null
+  );
+  const [composedImage, setComposedImage] = React.useState<string | null>(null);
   const [processingState, setProcessingState] =
     React.useState<ProcessingState>("idle");
   const [error, setError] = React.useState<string | null>(null);
@@ -38,8 +43,14 @@ export default function Home() {
       if (currentImage && currentImage.startsWith("blob:")) {
         window.URL.revokeObjectURL(currentImage);
       }
+      if (customBackground && customBackground.startsWith("blob:")) {
+        window.URL.revokeObjectURL(customBackground);
+      }
+      if (composedImage && composedImage.startsWith("blob:")) {
+        window.URL.revokeObjectURL(composedImage);
+      }
     };
-  }, [currentImage]);
+  }, [currentImage, customBackground, composedImage]);
 
   const handleImageSelect = async (file: File) => {
     try {
@@ -70,7 +81,8 @@ export default function Home() {
   ) => {
     if (processedImage) {
       try {
-        await downloadImage(processedImage, format, quality ?? 90);
+        const imageToDownload = composedImage || processedImage;
+        await downloadImage(imageToDownload, format, quality ?? 90);
         addToast(
           "success",
           `Image downloaded as ${format.toUpperCase()} successfully!`
@@ -81,12 +93,48 @@ export default function Home() {
     }
   };
 
+  const handleBackgroundSelect = async (file: File) => {
+    try {
+      if (!processedImage) {
+        addToast("error", "Please process an image first");
+        return;
+      }
+
+      const backgroundUrl = window.URL.createObjectURL(file);
+      setCustomBackground(backgroundUrl);
+
+      const composed = await composeImageWithBackground(
+        processedImage,
+        backgroundUrl
+      );
+
+      if (composedImage && composedImage.startsWith("blob:")) {
+        window.URL.revokeObjectURL(composedImage);
+      }
+
+      setComposedImage(composed);
+      addToast("success", "Custom background added successfully! 🎨");
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to add background";
+      addToast("error", errorMessage);
+    }
+  };
+
   const handleReset = () => {
     if (currentImage && currentImage.startsWith("blob:")) {
       window.URL.revokeObjectURL(currentImage);
     }
+    if (customBackground && customBackground.startsWith("blob:")) {
+      window.URL.revokeObjectURL(customBackground);
+    }
+    if (composedImage && composedImage.startsWith("blob:")) {
+      window.URL.revokeObjectURL(composedImage);
+    }
     setCurrentImage(null);
     setProcessedImage(null);
+    setCustomBackground(null);
+    setComposedImage(null);
     setProcessingState("idle");
     setError(null);
   };
@@ -129,7 +177,7 @@ export default function Home() {
       <section
         ref={toolSectionRef}
         id="tool-section"
-        className="min-h-screen overflow-hidden pt-20 pb-20"
+        className="min-h-screen overflow-hidden pt-20"
       >
         <div className="mx-auto px-4">
           <div className="mx-auto">
@@ -177,8 +225,10 @@ export default function Home() {
                     <ImagePreview
                       originalImage={currentImage}
                       processedImage={null}
+                      composedImage={null}
                       onDownload={handleDownload}
                       onReset={handleReset}
+                      onBackgroundSelect={handleBackgroundSelect}
                     />
                   </React.Suspense>
                 </div>
@@ -191,8 +241,10 @@ export default function Home() {
                   <ImagePreview
                     originalImage={currentImage}
                     processedImage={processedImage}
+                    composedImage={composedImage}
                     onDownload={handleDownload}
                     onReset={handleReset}
+                    onBackgroundSelect={handleBackgroundSelect}
                   />
                 </React.Suspense>
               )}
