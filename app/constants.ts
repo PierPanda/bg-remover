@@ -135,6 +135,8 @@ export const imagePreviewContent = {
     original: "Original",
     processed: "Processed",
     processing: "Processing...",
+    before: "Before",
+    after: "After",
   },
   buttons: {
     showExportOptions: "Options d'export",
@@ -142,6 +144,11 @@ export const imagePreviewContent = {
   },
   icons: {
     settings: "lucide:settings",
+    compare: "lucide:split-square-horizontal",
+  },
+  viewModes: {
+    sideBySide: "Side by Side",
+    compare: "Compare",
   },
 };
 
