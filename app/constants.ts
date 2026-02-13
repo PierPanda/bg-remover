@@ -45,6 +45,10 @@ export const previewBtnText = {
     text: "Process Another Image",
     icon: "lucide:refresh-cw",
   },
+  addBackground: {
+    text: "Add Background",
+    icon: "lucide:upload",
+  },
 };
 
 export const toastConfig = {
@@ -137,6 +141,7 @@ export const imagePreviewContent = {
     processing: "Processing...",
     before: "Before",
     after: "After",
+    withBackground: "With Custom Background",
   },
   buttons: {
     showExportOptions: "Options d'export",
