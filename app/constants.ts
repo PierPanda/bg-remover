@@ -18,11 +18,6 @@ export const landingContent = {
     cta: "Try",
     ctaIcon: "lucide:arrow-down",
   },
-  stats: [
-    { value: "100%", label: "Free" },
-    { value: "<5s", label: "Processing" },
-    { value: "HD", label: "Quality" },
-  ],
 };
 
 export const footerContent = {
