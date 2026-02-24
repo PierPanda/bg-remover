@@ -312,6 +312,7 @@ export default function BackgroundSelector({
                     background: `linear-gradient(135deg, ${preset.colors[0]}, ${preset.colors[1]})`,
                   }}
                   title={preset.label}
+                  aria-label={`${preset.label} gradient preset`}
                 />
               ))}
             </div>
