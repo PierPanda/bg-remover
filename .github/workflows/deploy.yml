@@ -45,7 +45,15 @@ jobs:
       - name: Deploy to Vercel
         id: deploy
         run: |
-          url=$(vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
+          for i in 1 2 3; do
+            url=$(vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}) && break
+            echo "Attempt $i failed, retrying in 10 seconds..."
+            sleep 10
+          done
+          if [ -z "$url" ]; then
+            echo "Deployment failed after 3 attempts"
+            exit 1
+          fi
           echo "deployment_url=$url" >> $GITHUB_OUTPUT
 
       - name: Comment PR with deployment URL
