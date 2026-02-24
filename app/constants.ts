@@ -92,9 +92,9 @@ export const toastContent = {
 };
 
 export const exportFormats = [
-  { value: "png" as const, label: "PNG (Transparent)", icon: "lucide:image" },
-  { value: "jpg" as const, label: "JPG (Compressed)", icon: "lucide:image" },
-  { value: "webp" as const, label: "WebP (Modern)", icon: "lucide:image" },
+  { value: "png" as const, label: "PNG", icon: "lucide:image" },
+  { value: "jpg" as const, label: "JPG", icon: "lucide:image" },
+  { value: "webp" as const, label: "WebP", icon: "lucide:image" },
 ] as const;
 
 export type ExportFormatValue = (typeof exportFormats)[number]["value"];

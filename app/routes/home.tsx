@@ -7,7 +7,7 @@ import LoadingSpinner from "~/components/loading-spinner";
 import { removeBackground } from "~/services/api-client";
 import { downloadImage } from "~/services/file-download";
 import { useToast } from "~/hooks/use-toast";
-import type { ProcessingState } from "~/types";
+import type { BackgroundOption, ProcessingState } from "~/types";
 
 const ImagePreview = React.lazy(() => import("~/components/image-preview"));
 
@@ -66,11 +66,12 @@ export default function Home() {
 
   const handleDownload = async (
     format: "png" | "jpg" | "webp" = "png",
-    quality?: number
+    quality?: number,
+    background?: BackgroundOption
   ) => {
     if (processedImage) {
       try {
-        await downloadImage(processedImage, format, quality ?? 90);
+        await downloadImage(processedImage, format, quality ?? 90, background);
         addToast(
           "success",
           `Image downloaded as ${format.toUpperCase()} successfully!`

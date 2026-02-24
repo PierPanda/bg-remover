@@ -5,6 +5,7 @@ import {
   imagePreviewContent,
   type ExportFormatValue,
 } from "~/constants";
+import type { BackgroundOption } from "~/types";
 import ExportOptions from "./export-options";
 import * as React from "react";
 
@@ -14,8 +15,63 @@ type ViewMode = "side-by-side" | "compare";
 interface ImagePreviewProps {
   originalImage: string;
   processedImage: string | null;
-  onDownload: (format: ExportFormat, quality?: number) => void;
+  onDownload: (
+    format: ExportFormat,
+    quality?: number,
+    background?: BackgroundOption
+  ) => void;
   onReset: () => void;
+}
+
+function getBackgroundStyle(option: BackgroundOption): React.CSSProperties {
+  switch (option.type) {
+    case "transparent":
+      return {
+        backgroundImage: `
+          linear-gradient(45deg, #ccc 25%, transparent 25%),
+          linear-gradient(-45deg, #ccc 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, #ccc 75%),
+          linear-gradient(-45deg, transparent 75%, #ccc 75%)
+        `,
+        backgroundSize: "20px 20px",
+        backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px",
+      };
+    case "solid":
+      return {
+        backgroundColor: option.color ?? "#FFFFFF",
+      };
+    case "gradient":
+      if (option.gradient) {
+        const { type, colors, angle = 180 } = option.gradient;
+        return {
+          background:
+            type === "linear"
+              ? `linear-gradient(${angle}deg, ${colors[0]}, ${colors[1]})`
+              : `radial-gradient(circle, ${colors[0]}, ${colors[1]})`,
+        };
+      }
+      return {};
+    case "image":
+      if (option.imageUrl) {
+        return {
+          backgroundImage: `url(${option.imageUrl})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        };
+      }
+      return {
+        backgroundImage: `
+          linear-gradient(45deg, #ccc 25%, transparent 25%),
+          linear-gradient(-45deg, #ccc 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, #ccc 75%),
+          linear-gradient(-45deg, transparent 75%, #ccc 75%)
+        `,
+        backgroundSize: "20px 20px",
+        backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px",
+      };
+    default:
+      return {};
+  }
 }
 
 export default function ImagePreview({
@@ -28,14 +84,20 @@ export default function ImagePreview({
   const [viewMode, setViewMode] = React.useState<ViewMode>("side-by-side");
   const [sliderPosition, setSliderPosition] = React.useState(50);
   const [isDragging, setIsDragging] = React.useState(false);
+  const [backgroundOption, setBackgroundOption] =
+    React.useState<BackgroundOption>({ type: "transparent" });
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   const handleQuickDownload = () => {
-    onDownload("png");
+    onDownload("png", undefined, backgroundOption);
   };
 
   const handleExportDownload = (format: ExportFormat, quality?: number) => {
-    onDownload(format, quality);
+    onDownload(format, quality, backgroundOption);
+  };
+
+  const handleBackgroundChange = (option: BackgroundOption) => {
+    setBackgroundOption(option);
   };
 
   const updateSliderPosition = (clientX: number) => {
@@ -71,6 +133,8 @@ export default function ImagePreview({
     }
   };
 
+  const backgroundStyle = getBackgroundStyle(backgroundOption);
+
   const renderCompareView = () => {
     if (!processedImage) return null;
 
@@ -89,13 +153,15 @@ export default function ImagePreview({
           onPointerUp={handlePointerUp}
           onKeyDown={handleKeyDown}
         >
-          <img
-            src={processedImage}
-            alt={imagePreviewContent.labels.after}
-            className="h-auto w-full object-contain bg-[repeating-conic-gradient(#e5e5e5_0%_25%,#fff_0%_50%)_50%/20px_20px]"
-            style={{ maxHeight: "500px" }}
-            draggable={false}
-          />
+          <div className="relative" style={backgroundStyle}>
+            <img
+              src={processedImage}
+              alt={imagePreviewContent.labels.after}
+              className="h-auto w-full object-contain"
+              style={{ maxHeight: "500px" }}
+              draggable={false}
+            />
+          </div>
 
           <div
             className="absolute inset-0"
@@ -176,16 +242,7 @@ export default function ImagePreview({
               <div className="relative">
                 <div
                   className="absolute inset-0 rounded-lg"
-                  style={{
-                    backgroundImage: `
-                      linear-gradient(45deg, #ccc 25%, transparent 25%),
-                      linear-gradient(-45deg, #ccc 25%, transparent 25%),
-                      linear-gradient(45deg, transparent 75%, #ccc 75%),
-                      linear-gradient(-45deg, transparent 75%, #ccc 75%)
-                    `,
-                    backgroundSize: "20px 20px",
-                    backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px",
-                  }}
+                  style={backgroundStyle}
                 />
                 <img
                   src={processedImage}
@@ -288,7 +345,8 @@ export default function ImagePreview({
 
       {showExportOptions && processedImage && (
         <ExportOptions
-          imageUrl={processedImage}
+          backgroundOption={backgroundOption}
+          onBackgroundChange={handleBackgroundChange}
           onDownload={handleExportDownload}
         />
       )}
