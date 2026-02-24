@@ -397,6 +397,7 @@ export default function BackgroundSelector({
                   className="absolute right-2 top-2"
                   onPress={handleRemoveImage}
                   isIconOnly
+                  aria-label="Remove background image"
                 >
                   <Icon icon="lucide:x" className="h-4 w-4" />
                 </Button>
