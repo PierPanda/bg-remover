@@ -72,7 +72,14 @@ async function drawBackgroundImage(
   height: number,
   imageUrl: string
 ): Promise<void> {
-  const bgImg = await loadImage(imageUrl);
+  let bgImg: HTMLImageElement;
+  try {
+    bgImg = await loadImage(imageUrl);
+  } catch {
+    throw new Error(
+      "Failed to load background image. This may be due to CORS restrictions or an invalid URL."
+    );
+  }
 
   const scale = Math.max(width / bgImg.width, height / bgImg.height);
   const scaledWidth = bgImg.width * scale;
@@ -101,8 +108,7 @@ async function convertImageFormat(
   }
 
   const needsBackground =
-    format === "jpg" ||
-    (background && background.type !== "transparent");
+    format === "jpg" || (background && background.type !== "transparent");
 
   if (needsBackground) {
     const bgOption: BackgroundOption = background ?? {
@@ -114,7 +120,8 @@ async function convertImageFormat(
       await drawBackgroundImage(ctx, img.width, img.height, bgOption.imageUrl);
     } else if (bgOption.type !== "transparent") {
       drawBackground(ctx, img.width, img.height, bgOption);
-    } else if (format === "jpg") {
+    } else {
+      // Fallback to white background for JPG format (which doesn't support transparency)
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
@@ -145,8 +152,7 @@ export async function downloadImage(
     const filename = `bg-removed-${timestamp}.${format}`;
 
     const needsConversion =
-      format !== "png" ||
-      (background && background.type !== "transparent");
+      format !== "png" || (background && background.type !== "transparent");
 
     if (!needsConversion && imageUrl.startsWith("https://")) {
       const response = await fetch(imageUrl);

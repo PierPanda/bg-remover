@@ -1,4 +1,10 @@
-import { Button, Popover, PopoverTrigger, PopoverContent, Slider } from "@heroui/react";
+import {
+  Button,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  Slider,
+} from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { HexColorPicker, HexColorInput } from "react-colorful";
 import * as React from "react";
@@ -58,7 +64,11 @@ interface ColorPickerButtonProps {
   size?: "sm" | "md";
 }
 
-function ColorPickerButton({ color, onChange, size = "md" }: ColorPickerButtonProps) {
+function ColorPickerButton({
+  color,
+  onChange,
+  size = "md",
+}: ColorPickerButtonProps) {
   const sizeClasses = size === "sm" ? "h-8 w-8" : "h-10 w-10";
   const innerSize = size === "sm" ? "h-6 w-6" : "h-8 w-8";
 
@@ -66,6 +76,7 @@ function ColorPickerButton({ color, onChange, size = "md" }: ColorPickerButtonPr
     <Popover placement="bottom">
       <PopoverTrigger>
         <button
+          aria-label="Select custom color"
           className={`${sizeClasses} flex cursor-pointer items-center justify-center rounded-full border-2 border-dashed border-gray-300 transition-colors hover:border-gray-400 dark:border-gray-600`}
         >
           <div
@@ -116,6 +127,15 @@ export default function BackgroundSelector({
   );
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  // Cleanup blob URL on unmount to prevent memory leaks
+  React.useEffect(() => {
+    return () => {
+      if (uploadedImage) {
+        URL.revokeObjectURL(uploadedImage);
+      }
+    };
+  }, [uploadedImage]);
+
   const handleTabChange = (type: BackgroundType) => {
     if (type === "transparent") {
       onChange({ type: "transparent" });
@@ -165,9 +185,7 @@ export default function BackgroundSelector({
     position: "first" | "second"
   ) => {
     const newColors: [string, string] =
-      position === "first"
-        ? [color, gradientColor2]
-        : [gradientColor1, color];
+      position === "first" ? [color, gradientColor2] : [gradientColor1, color];
     if (position === "first") setGradientColor1(color);
     else setGradientColor2(color);
     onChange({
@@ -207,11 +225,25 @@ export default function BackgroundSelector({
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setUploadedImage(url);
-      onChange({ type: "image", imageUrl: url });
+    if (!file) return;
+
+    const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+
+    // Validate that the selected file is an image and within the allowed size
+    if (!file.type.startsWith("image/") || file.size > MAX_IMAGE_SIZE) {
+      // Reset the input so the user can select a different file
+      e.target.value = "";
+      return;
     }
+
+    // Revoke previous URL to prevent memory leaks
+    if (uploadedImage) {
+      URL.revokeObjectURL(uploadedImage);
+    }
+
+    const url = URL.createObjectURL(file);
+    setUploadedImage(url);
+    onChange({ type: "image", imageUrl: url });
   };
 
   const handleRemoveImage = () => {
@@ -261,6 +293,7 @@ export default function BackgroundSelector({
                   }`}
                   style={{ backgroundColor: preset.color }}
                   title={preset.label}
+                  aria-label={`${preset.label} color preset`}
                 >
                   {customColor.toUpperCase() === preset.color.toUpperCase() && (
                     <Icon
@@ -298,13 +331,15 @@ export default function BackgroundSelector({
         return (
           <div className="space-y-4">
             <div className="flex flex-wrap gap-3">
-              {GRADIENT_PRESETS.map((preset, index) => (
+              {GRADIENT_PRESETS.map((preset) => (
                 <button
-                  key={index}
+                  key={`${preset.colors[0]}-${preset.colors[1]}`}
                   onClick={() => handleGradientPreset(preset.colors)}
                   className={`h-10 w-16 rounded-lg border-2 transition-all ${
-                    gradientColor1.toUpperCase() === preset.colors[0].toUpperCase() &&
-                    gradientColor2.toUpperCase() === preset.colors[1].toUpperCase()
+                    gradientColor1.toUpperCase() ===
+                      preset.colors[0].toUpperCase() &&
+                    gradientColor2.toUpperCase() ===
+                      preset.colors[1].toUpperCase()
                       ? "border-blue-500 ring-2 ring-blue-500/30"
                       : "border-gray-300 hover:border-gray-400 dark:border-gray-600"
                   }`}
@@ -320,7 +355,9 @@ export default function BackgroundSelector({
               <div className="flex items-center gap-2">
                 <ColorPickerButton
                   color={gradientColor1}
-                  onChange={(color) => handleGradientColorChange(color, "first")}
+                  onChange={(color) =>
+                    handleGradientColorChange(color, "first")
+                  }
                   size="sm"
                 />
                 <Icon
@@ -329,7 +366,9 @@ export default function BackgroundSelector({
                 />
                 <ColorPickerButton
                   color={gradientColor2}
-                  onChange={(color) => handleGradientColorChange(color, "second")}
+                  onChange={(color) =>
+                    handleGradientColorChange(color, "second")
+                  }
                   size="sm"
                 />
               </div>
@@ -353,11 +392,15 @@ export default function BackgroundSelector({
             </div>
             {gradientType === "linear" && (
               <div>
-                <label className="mb-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                <label
+                  htmlFor="gradient-angle-slider"
+                  className="mb-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400"
+                >
                   <span>Angle</span>
                   <span>{gradientAngle}°</span>
                 </label>
                 <Slider
+                  id="gradient-angle-slider"
                   size="sm"
                   step={15}
                   minValue={0}
@@ -366,6 +409,7 @@ export default function BackgroundSelector({
                   onChange={(v) => handleGradientAngleChange(v as number)}
                   className="max-w-full"
                   color="primary"
+                  aria-label="Gradient angle"
                 />
               </div>
             )}
@@ -405,13 +449,12 @@ export default function BackgroundSelector({
               </div>
             ) : (
               <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
+                aria-label="Upload background image"
                 className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 transition-colors hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500"
               >
-                <Icon
-                  icon="lucide:upload"
-                  className="h-8 w-8 text-gray-400"
-                />
+                <Icon icon="lucide:upload" className="h-8 w-8 text-gray-400" />
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   Upload background image
                 </span>
