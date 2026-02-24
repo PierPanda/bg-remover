@@ -1,3 +1,16 @@
+export type BackgroundType = "transparent" | "solid" | "gradient" | "image";
+
+export interface BackgroundOption {
+  type: BackgroundType;
+  color?: string;
+  gradient?: {
+    type: "linear" | "radial";
+    colors: [string, string];
+    angle?: number;
+  };
+  imageUrl?: string;
+}
+
 export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;

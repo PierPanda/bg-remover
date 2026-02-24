@@ -7,16 +7,20 @@ import {
   exportQualityConfig,
   type ExportFormatValue,
 } from "~/constants";
+import type { BackgroundOption } from "~/types";
+import BackgroundSelector from "./background-selector";
 
 type ExportFormat = ExportFormatValue;
 
 interface ExportOptionsProps {
-  imageUrl: string;
+  backgroundOption: BackgroundOption;
+  onBackgroundChange: (option: BackgroundOption) => void;
   onDownload: (format: ExportFormat, quality?: number) => void;
 }
 
 export default function ExportOptions({
-  imageUrl,
+  backgroundOption,
+  onBackgroundChange,
   onDownload,
 }: ExportOptionsProps) {
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>("png");
@@ -44,6 +48,11 @@ export default function ExportOptions({
       <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
         {exportOptionsContent.title}
       </h3>
+
+      <BackgroundSelector
+        value={backgroundOption}
+        onChange={onBackgroundChange}
+      />
 
       <div className="mb-6">
         <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">

@@ -76,25 +76,16 @@ export async function action({ request }: Route.ActionArgs) {
 
     RemoveBg.logRequest(request, { action: "remove-background" });
 
-    console.log("[Upload] Starting image extraction from form data");
     const file = await RemoveBg.extractFileFromFormData(request, "image");
-    console.log("[Upload] Image extracted successfully:", {
-      name: file.name,
-      size: `${(file.size / 1024).toFixed(2)} KB`,
-      type: file.type,
-    });
 
-    console.log("[Upload] Validating image file");
     const validation = RemoveBg.validateImageFile(file);
     if (!validation.isValid && validation.error) {
-      console.error("[Upload] Validation failed:", validation.error);
       throw RemoveBg.createApiError(
         validation.error.code,
         validation.error.message,
         400
       );
     }
-    console.log("[Upload] Image validation passed");
 
     RemoveBg.logRequest(request, {
       fileName: file.name,
@@ -110,25 +101,9 @@ export async function action({ request }: Route.ActionArgs) {
       );
     }
 
-    console.log("[Upload] Preparing image for API submission");
     const formData = new FormData();
     formData.append("image_file", file);
     formData.append("size", "auto");
-
-    console.log("[Upload] Payload prepared for API:", {
-      endpoint: apiUrl,
-      method: "POST",
-      imageFile: {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-      },
-      parameters: {
-        size: "auto",
-      },
-      hasApiKey: !!BgRemoverAPIKey,
-    });
-    console.log("[Upload] Sending request to Remove.bg API...");
 
     // Fetch with timeout and retry logic for resilience on slow networks
     let removeBgResponse: Response | null = null;
@@ -138,9 +113,6 @@ export async function action({ request }: Route.ActionArgs) {
       try {
         if (attempt > 0) {
           const backoffDelay = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
-          console.log(
-            `[Upload] Retry attempt ${attempt}/${MAX_RETRIES} after ${backoffDelay}ms`
-          );
           await delay(backoffDelay);
 
           // Recreate FormData for retry (body is consumed by previous attempt)
@@ -173,17 +145,6 @@ export async function action({ request }: Route.ActionArgs) {
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
-        if (lastError.name === "AbortError") {
-          console.error(
-            `[Upload] Request timeout after ${REMOVE_BG_TIMEOUT_MS}ms (attempt ${attempt + 1}/${MAX_RETRIES + 1})`
-          );
-        } else {
-          console.error(
-            `[Upload] Network error (attempt ${attempt + 1}/${MAX_RETRIES + 1}):`,
-            lastError.message
-          );
-        }
-
         // Only retry on retryable errors and if we have not exhausted attempts
         if (!isRetryableError(error) || attempt === MAX_RETRIES) {
           if (lastError.name === "AbortError") {
@@ -209,11 +170,6 @@ export async function action({ request }: Route.ActionArgs) {
         503
       );
     }
-
-    console.log(
-      "[Upload] API response received with status:",
-      removeBgResponse.status
-    );
 
     if (!removeBgResponse.ok) {
       const errorText = await removeBgResponse.text();
@@ -266,10 +222,7 @@ export async function action({ request }: Route.ActionArgs) {
 
     const imageBuffer = await removeBgResponse.arrayBuffer();
 
-    console.log("[Upload] Uploading processed image to Vercel Blob...");
-
     if (!BlobReadWriteToken) {
-      console.error("[Upload] BLOB_READ_WRITE_TOKEN not configured");
       throw RemoveBg.createApiError(
         "CONFIGURATION_ERROR",
         "Vercel Blob token not configured",
@@ -283,8 +236,6 @@ export async function action({ request }: Route.ActionArgs) {
       contentType: "image/png",
       token: BlobReadWriteToken,
     });
-
-    console.log("[Upload] Image uploaded to Vercel Blob:", blob.url);
 
     const processingTime = Date.now() - startTime;
 
