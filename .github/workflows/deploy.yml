@@ -8,10 +8,6 @@ on:
     branches:
       - "**"
 
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
 jobs:
   deploy:
     permissions:
@@ -27,9 +23,29 @@ jobs:
 
       - name: Deploy to Vercel
         id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          url=$(vercel deploy ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
-          echo "deployment_url=$url" >> $GITHUB_OUTPUT
+          set -euo pipefail
+
+          # Fail fast if secrets are missing
+          test -n "${VERCEL_TOKEN}" || (echo "::error::Missing VERCEL_TOKEN secret" && exit 1)
+          test -n "${VERCEL_ORG_ID}" || (echo "::error::Missing VERCEL_ORG_ID secret" && exit 1)
+          test -n "${VERCEL_PROJECT_ID}" || (echo "::error::Missing VERCEL_PROJECT_ID secret" && exit 1)
+
+          # Build args with deterministic targeting
+          args="--token=${VERCEL_TOKEN} --scope=${VERCEL_ORG_ID} --confirm"
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            args="--prod $args"
+          fi
+
+          # Deploy and capture output
+          out="$(vercel deploy $args 2>&1 | tee /dev/stderr)"
+          url="$(echo "$out" | grep -E '^https://' | tail -n 1)"
+
+          echo "deployment_url=$url" >> "$GITHUB_OUTPUT"
 
       - name: Comment PR with deployment URL
         if: github.event_name == 'pull_request'
